@@ -13,15 +13,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Method;
 
 @RestController
 @RequestMapping("/dynamic-form")
@@ -49,9 +43,22 @@ public class HtmlFormController {
         return new ResponseEntity<>(htmlFormMapper.fromHtmlFormField(savedHtmlFormField), HttpStatus.CREATED);
     }
 
+    @PostMapping("/make-form-field-active/{formFieldId}")
+    public ResponseEntity<?>  makeFormFieldActive(@PathVariable Long formFieldId) {
+        htmlFormService.makeFormFieldActive(formFieldId);
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
     @PostMapping("/make-form-active/{formId}")
     public ResponseEntity<?> makeFormActive(@PathVariable Long formId) {
         htmlFormService.makeFormActive(formId);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @GetMapping("/fetch-form-to-fill/{formId}")
+    public ResponseEntity<?> fetchFormToFill(@PathVariable Long formId) {
+        HtmlForm htmlForm = htmlFormService.fetchFormToFill(formId);
+        HtmlFormResponse htmlFormResponse = htmlFormMapper.fromHtmlForm(htmlForm);
+        return ResponseEntity.ok(htmlFormResponse);
     }
 }

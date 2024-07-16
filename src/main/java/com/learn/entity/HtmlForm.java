@@ -53,7 +53,7 @@ public class HtmlForm {
     @OneToMany(
             mappedBy = "htmlForm",
             fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST}
+            cascade = CascadeType.ALL
     )
     private Set<HtmlFormField> htmlFormFields = new LinkedHashSet<>();
 
@@ -70,5 +70,19 @@ public class HtmlForm {
         return htmlFormFields.stream()
                 .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
                 .findFirst();
+    }
+
+    @Override
+    public String toString() {
+        return "HtmlForm{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", remark='" + remark + '\'' +
+                ", createdDate=" + createdDate +
+                ", lastModifiedDate=" + lastModifiedDate +
+                ", version=" + version +
+                ", formStatus=" + formStatus +
+                ", autoDisableSubmissionAfterDate=" + autoDisableSubmissionAfterDate +
+                '}';
     }
 }

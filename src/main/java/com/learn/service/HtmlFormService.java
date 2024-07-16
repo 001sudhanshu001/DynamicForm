@@ -1,9 +1,11 @@
 package com.learn.service;
 
+import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
 import com.learn.entity.HtmlForm;
 import com.learn.entity.HtmlFormField;
 import com.learn.exception.ApplicationException;
+import com.learn.repository.HtmlFormFieldRepository;
 import com.learn.repository.HtmlFormRepository;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class HtmlFormService {
     private final HtmlFormRepository htmlFormRepository;
+    private final HtmlFormFieldRepository htmlFormFieldRepository;
+
 
     @Transactional
     public HtmlForm save(HtmlForm htmlForm) {
@@ -41,7 +45,9 @@ public class HtmlFormService {
     public void makeFormActive(Long formId) {
         HtmlForm htmlForm = htmlFormRepository.findById(formId)
                 .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
+
         Set<HtmlFormField> htmlFormFields = htmlForm.getHtmlFormFields();
+
         if (htmlFormFields.isEmpty()) {
             throw new ApplicationException(
                     HttpStatus.BAD_REQUEST,
@@ -52,6 +58,7 @@ public class HtmlFormService {
                 .filter(HtmlFormField::isActive)
                 .findFirst();
         if (probablyActiveFormField.isEmpty()) {
+            // TODO Implementing Global Exception Handler
             throw new ApplicationException(
                     HttpStatus.BAD_REQUEST,
                     "Required At Least One Active Form Field To Activate Form"
@@ -60,4 +67,23 @@ public class HtmlFormService {
         htmlForm.setFormStatus(FormStatus.ACTIVE);
         htmlFormRepository.save(htmlForm);
     }
+
+    @Transactional
+    public void makeFormFieldActive(Long formFieldId) {
+        HtmlFormField htmlFormField = htmlFormFieldRepository.findById(formFieldId)
+                .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlFormField", formFieldId));
+
+        htmlFormField.setFormFieldStatus(FormFieldStatus.ACTIVE);
+        htmlFormFieldRepository.save(htmlFormField);
+    }
+
+    public HtmlForm fetchFormToFill(Long formId) {
+        HtmlForm htmlForm = htmlFormRepository.findById(formId)
+                .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
+        if (!htmlForm.isActive()) {
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, "HtmlForm Is Not Active At The Moment");
+        }
+        return htmlForm;
+    }
+
 }

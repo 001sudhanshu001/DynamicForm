@@ -81,4 +81,23 @@ public class HtmlFormField {
         return FormFieldStatus.ACTIVE.equals(formFieldStatus);
     }
 
+    @Override
+    public String toString() {
+        return "HtmlFormField{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", label='" + label + '\'' +
+                ", validationRules=" + validationRules +
+                ", sortingOrder=" + sortingOrder +
+                ", formFieldStatus=" + formFieldStatus +
+                ", remarks='" + remarks + '\'' +
+                ", placeHolder='" + placeHolder + '\'' +
+                ", helpDescription='" + helpDescription + '\'' +
+                ", createdDate=" + createdDate +
+                ", lastModifiedDate=" + lastModifiedDate +
+                ", version=" + version +
+                ", formId=" + formId +
+                '}';
+    }
 }
