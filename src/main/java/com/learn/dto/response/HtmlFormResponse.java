@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,4 +17,5 @@ public class HtmlFormResponse {
     private String name;
     private String remark;
     private FormStatus formStatus;
+    private Set<HtmlFormFieldResponse> htmlFormFields;
 }

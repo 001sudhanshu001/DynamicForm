@@ -73,4 +73,12 @@ public class HtmlFormField {
 
     @Version
     private Long version;
+
+    @Transient
+    private Long formId;
+
+    public boolean isActive() {
+        return FormFieldStatus.ACTIVE.equals(formFieldStatus);
+    }
+
 }

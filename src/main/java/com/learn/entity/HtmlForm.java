@@ -4,10 +4,14 @@ import com.learn.constants.FormStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Entity
 @Getter @Setter
@@ -46,4 +50,25 @@ public class HtmlForm {
     @Column(name = "auto_disable_submission_after_date")
     private LocalDateTime autoDisableSubmissionAfterDate;
 
+    @OneToMany(
+            mappedBy = "htmlForm",
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST}
+    )
+    private Set<HtmlFormField> htmlFormFields = new LinkedHashSet<>();
+
+    public boolean isActive() {
+        return FormStatus.ACTIVE.equals(formStatus);
+    }
+
+    public void addHtmlFormField(HtmlFormField htmlFormField) {
+        htmlFormFields.add(htmlFormField);
+        htmlFormField.setHtmlForm(this);
+    }
+
+    public Optional<HtmlFormField> htmlFormFieldHavingName(String formFieldName) {
+        return htmlFormFields.stream()
+                .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
+                .findFirst();
+    }
 }
