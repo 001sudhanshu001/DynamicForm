@@ -57,6 +57,9 @@ public class HtmlForm {
     )
     private Set<HtmlFormField> htmlFormFields = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "htmlForm", fetch = FetchType.LAZY)
+    private Set<FilledHtmlForm> filledHtmlForms;
+
     public boolean isActive() {
         return FormStatus.ACTIVE.equals(formStatus);
     }

@@ -3,8 +3,11 @@ package com.learn.controller;
 import com.learn.constants.FormStatus;
 import com.learn.dto.request.HtmlFormCreationPayload;
 import com.learn.dto.request.HtmlFormFieldCreationPayload;
+import com.learn.dto.request.SubmitDynamicFormPayload;
+import com.learn.dto.response.FilledHtmlFormResponse;
 import com.learn.dto.response.HtmlFormFieldResponse;
 import com.learn.dto.response.HtmlFormResponse;
+import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
 import com.learn.entity.HtmlFormField;
 import com.learn.mapper.HtmlFormMapper;
@@ -60,5 +63,11 @@ public class HtmlFormController {
         HtmlForm htmlForm = htmlFormService.fetchFormToFill(formId);
         HtmlFormResponse htmlFormResponse = htmlFormMapper.fromHtmlForm(htmlForm);
         return ResponseEntity.ok(htmlFormResponse);
+    }
+
+    @PostMapping("/submit-form")
+    public ResponseEntity<FilledHtmlFormResponse> submitForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
+        FilledHtmlForm filledHtmlForm = htmlFormService.submitForm(payload);
+        return new ResponseEntity<>(new FilledHtmlFormResponse(filledHtmlForm), HttpStatus.ACCEPTED);
     }
 }
