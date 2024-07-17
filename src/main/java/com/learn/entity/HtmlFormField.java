@@ -2,6 +2,7 @@ package com.learn.entity;
 
 import com.learn.dto.internal.FieldValidationResult;
 import com.learn.entity.validator.NumberTypeValueValidator;
+import com.learn.entity.validator.RadioTypeValueValidator;
 import com.learn.entity.validator.TextTypeValueValidator;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import com.learn.constants.FormFieldStatus;
@@ -98,7 +99,8 @@ public class HtmlFormField {
 
     // If the validationRules for this filed contains
     public boolean isMandatoryField() {
-        return validationRules.containsKey(FormFieldValidationRule.REQUIRED) && Objects.equals(validationRules.get(FormFieldValidationRule.REQUIRED), "true");
+        return validationRules.containsKey(FormFieldValidationRule.REQUIRED)
+                && Objects.equals(validationRules.get(FormFieldValidationRule.REQUIRED), "true");
 
     }
 
@@ -107,12 +109,20 @@ public class HtmlFormField {
             String fieldValueAsString = formFieldValue != null ? String.valueOf(formFieldValue) : null;
             TextTypeValueValidator textTypeValueValidator =
                     new TextTypeValueValidator(name, validationRules, fieldValueAsString);
+
             return textTypeValueValidator.validate();
         } else if (type.equals(InputType.NUMBER)) {
             NumberTypeValueValidator numberTypeValueValidation =
                     new NumberTypeValueValidator(name, validationRules, formFieldValue);
+
             return numberTypeValueValidation.validate();
+        }else if (type.equals(InputType.RADIO)) {
+            RadioTypeValueValidator radioTypeValueValidation =
+                    new RadioTypeValueValidator(name, validationRules, displayOptions, formFieldValue);
+
+            return radioTypeValueValidation.validate();
         }
+
         // TODO : Implementing rest of the field Validators
         return FieldValidationResult.builder().success(true).build();
     }
