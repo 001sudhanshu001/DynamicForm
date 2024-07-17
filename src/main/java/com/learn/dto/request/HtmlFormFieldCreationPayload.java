@@ -41,4 +41,6 @@ public class HtmlFormFieldCreationPayload {
     private String placeHolder;
 
     private String helpDescription;
+
+    private Map<String, String> displayOptions; // For Radio
 }

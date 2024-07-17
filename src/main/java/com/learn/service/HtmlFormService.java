@@ -139,7 +139,7 @@ public class HtmlFormService {
         List<String> invalidFormFields = submittedValuesForFields.stream() // Checking if the Fields sent in the Request are actually there in the form
                 .filter(fieldName -> htmlForm.htmlFormFieldHavingName(fieldName).isEmpty())
                 .toList();
-        if (!invalidFormFields.isEmpty()) { // If there are some FormField sent in the request that are not in the DataBase Form, then throw exception
+        if (!invalidFormFields.isEmpty()) { // If there are some FormField sent in the request that are not in the Database Form, then throw exception
             throw new ApplicationException(HttpStatus.BAD_REQUEST, "Invalid FormFields Provided:: " + invalidFormFields);
         }
 
@@ -164,7 +164,7 @@ public class HtmlFormService {
             );
         }
 
-        // Checking for each filed in the form if the value is within the Specified Rules
+        // Checking for each field(Key, value) in the form payload if the value is as per the Specified Rules
         Set<String> failedValidationResults = new HashSet<>();
 
         fieldFromPayload.forEach((fieldName, fieldValue) -> {

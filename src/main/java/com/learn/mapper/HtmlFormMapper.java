@@ -57,6 +57,7 @@ public class HtmlFormMapper {
         htmlFormField.setPlaceHolder(payload.getPlaceHolder());
         htmlFormField.setHelpDescription(payload.getHelpDescription());
         htmlFormField.setSortingOrder(Integer.MAX_VALUE);
+        htmlFormField.setDisplayOptions(payload.getDisplayOptions());
 
         return htmlFormField;
     }
@@ -84,6 +85,7 @@ public class HtmlFormMapper {
         htmlFormFieldResponse.setCreatedDate(htmlFormField.getCreatedDate());
         htmlFormFieldResponse.setLastModifiedDate(htmlFormField.getLastModifiedDate());
 
+        htmlFormFieldResponse.setDisplayOptions(htmlFormField.getDisplayOptions());
         htmlFormFieldResponse.setVersion(htmlFormField.getVersion());
 
         return htmlFormFieldResponse;

@@ -131,9 +131,9 @@ public class HtmlForm {
     public FieldValidationResult validateFieldValue(String formFieldName, Object formFieldValue) {
         return htmlFormFields.stream()
                 .filter(HtmlFormField::isActive)
-                .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
+                .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName)) // selecting a field whose name is as in the payload
                 .map(htmlFormField -> htmlFormField.validateValue(formFieldValue)) // for each filed checking the value is valid or not
-                .toList()
+                .toList() // called method of the field itself
                 .getFirst();
     }
 

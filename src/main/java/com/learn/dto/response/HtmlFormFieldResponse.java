@@ -1,5 +1,6 @@
 package com.learn.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormFieldValidationRule;
 import com.learn.constants.InputType;
@@ -26,6 +27,9 @@ public class HtmlFormFieldResponse {
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
     private Long version;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, String> displayOptions; // This is for Radio
 
     @Override
     public boolean equals(Object o) {

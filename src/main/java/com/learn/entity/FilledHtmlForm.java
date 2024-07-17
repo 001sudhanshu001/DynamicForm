@@ -20,7 +20,7 @@ import java.util.Map;
                         name = "user_filled_html_form_combine_unique_idx",
                         unique = true,
                         columnList = "html_form_id, filled_by_user_id"
-                )
+                ) // This makes sure that one student is allowed to fill form only once
         }
 )
 @Entity

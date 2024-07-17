@@ -1,6 +1,7 @@
 package com.learn.entity;
 
 import com.learn.dto.internal.FieldValidationResult;
+import com.learn.entity.validator.NumberTypeValueValidator;
 import com.learn.entity.validator.TextTypeValueValidator;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import com.learn.constants.FormFieldStatus;
@@ -81,6 +82,10 @@ public class HtmlFormField {
     @Transient
     private Long formId;
 
+    @Type(JsonType.class)
+    @Column(name = "display_options", columnDefinition = "json")
+    private Map<String, String> displayOptions; // This is for Radio
+
     public boolean isActive() {
         return FormFieldStatus.ACTIVE.equals(formFieldStatus);
     }
@@ -103,7 +108,12 @@ public class HtmlFormField {
             TextTypeValueValidator textTypeValueValidator =
                     new TextTypeValueValidator(name, validationRules, fieldValueAsString);
             return textTypeValueValidator.validate();
+        } else if (type.equals(InputType.NUMBER)) {
+            NumberTypeValueValidator numberTypeValueValidation =
+                    new NumberTypeValueValidator(name, validationRules, formFieldValue);
+            return numberTypeValueValidation.validate();
         }
+        // TODO : Implementing rest of the field Validators
         return FieldValidationResult.builder().success(true).build();
     }
 
