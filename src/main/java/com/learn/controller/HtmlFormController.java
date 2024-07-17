@@ -46,15 +46,25 @@ public class HtmlFormController {
         return new ResponseEntity<>(htmlFormMapper.fromHtmlFormField(savedHtmlFormField), HttpStatus.CREATED);
     }
 
-    @PostMapping("/make-form-field-active/{formFieldId}")
-    public ResponseEntity<?>  makeFormFieldActive(@PathVariable Long formFieldId) {
-        htmlFormService.makeFormFieldActive(formFieldId);
-        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
-    }
-
     @PostMapping("/make-form-active/{formId}")
     public ResponseEntity<?> makeFormActive(@PathVariable Long formId) {
         htmlFormService.makeFormActive(formId);
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @PatchMapping("/make-form-field-active/{formId}/{formFieldId}")
+    public ResponseEntity<?>  makeFormFieldActive(@PathVariable Long formId,
+                                                  @PathVariable Long formFieldId) {
+
+        htmlFormService.changeFormFieldStatus(formId, formFieldId, true);
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @PatchMapping("/make-form-field-inactive/{formId}/{formFieldId}")
+    public ResponseEntity<?> makeFormFieldInActive(@PathVariable Long formId,
+                                                        @PathVariable Long formFieldId) {
+
+        htmlFormService.changeFormFieldStatus(formId, formFieldId, false);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 

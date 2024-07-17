@@ -3,6 +3,7 @@ package com.learn.service;
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
 import com.learn.dto.internal.AddFormFieldResult;
+import com.learn.dto.internal.FieldStatusChangeResult;
 import com.learn.dto.request.SubmitDynamicFormPayload;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
@@ -16,7 +17,6 @@ import com.learn.repository.UserRepository;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,13 +85,28 @@ public class HtmlFormService {
         htmlFormRepository.save(htmlForm);
     }
 
-    @Transactional
-    public void makeFormFieldActive(Long formFieldId) {
-        HtmlFormField htmlFormField = htmlFormFieldRepository.findById(formFieldId)
-                .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlFormField", formFieldId));
+    @Transactional // To make filed active and inactive
+    public void changeFormFieldStatus(Long formId, Long formFieldId, boolean requestToMakeActive) {
+        HtmlForm htmlForm = htmlFormRepository.findById(formId)
+                .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
 
-        htmlFormField.setFormFieldStatus(FormFieldStatus.ACTIVE);
-        htmlFormFieldRepository.save(htmlFormField);
+        FieldStatusChangeResult result;
+
+        if(requestToMakeActive){
+            result = htmlForm.changeFormFieldStatus(formFieldId, true);
+        } else {
+            result = htmlForm.changeFormFieldStatus(formFieldId, false);
+        }
+
+        if (!result.isSuccess()) {
+            throw new ApplicationException(result.getHttpStatus(), result.getFailMessage());
+        }
+
+        if(requestToMakeActive) {
+            htmlFormFieldRepository.updateActiveStatus(formFieldId, FormFieldStatus.ACTIVE);
+        }else {
+            htmlFormFieldRepository.updateActiveStatus(formFieldId, FormFieldStatus.IN_ACTIVE);
+        }
     }
 
     public HtmlForm fetchFormToFill(Long formId) {

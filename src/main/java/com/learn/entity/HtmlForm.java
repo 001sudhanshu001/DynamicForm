@@ -1,19 +1,21 @@
 package com.learn.entity;
 
+import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
 import com.learn.dto.internal.AddFormFieldResult;
+import com.learn.dto.internal.FieldStatusChangeResult;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 @Entity
 @Getter @Setter
@@ -90,6 +92,27 @@ public class HtmlForm {
         return htmlFormFields.stream()
                 .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
                 .findFirst();
+    }
+
+    public FieldStatusChangeResult changeFormFieldStatus(Long formFieldId, boolean requestToMakeActive) {
+        Optional<HtmlFormField> optionalHtmlFormField = htmlFormFields.stream()
+                .filter(htmlFormField -> htmlFormField.getId().equals(formFieldId))
+                .findFirst();
+
+        String msg = requestToMakeActive ? "Activate" : "InActive";
+        if (optionalHtmlFormField.isEmpty()) {
+            String notFoundMessage = "Can't " + msg + " HtmlFormField, Not Found With Given Id:: " + formFieldId;
+            return FieldStatusChangeResult.failResult(HttpStatus.NOT_FOUND, notFoundMessage);
+        }
+
+        HtmlFormField htmlFormField = optionalHtmlFormField.get();
+        htmlFormField.setFormFieldStatus(FormFieldStatus.ACTIVE);
+
+        if (formStatus.equals(FormStatus.NO_ACTIVE_FORM_FIELD)) {
+            formStatus = FormStatus.ACTIVE;
+        }
+
+        return FieldStatusChangeResult.successResult();
     }
 
     @Override
