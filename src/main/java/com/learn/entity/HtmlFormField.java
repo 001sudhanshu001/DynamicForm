@@ -7,6 +7,7 @@ import com.learn.constants.InputType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
@@ -99,5 +100,9 @@ public class HtmlFormField {
                 ", version=" + version +
                 ", formId=" + formId +
                 '}';
+    }
+
+    public boolean fieldNameEqualsTo(String fieldName) {
+        return StringUtils.equals(name, fieldName);
     }
 }

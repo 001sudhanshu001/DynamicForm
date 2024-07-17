@@ -1,6 +1,7 @@
 package com.learn.entity;
 
 import com.learn.constants.FormStatus;
+import com.learn.dto.internal.AddFormFieldResult;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 @Entity
 @Getter @Setter
@@ -64,10 +66,25 @@ public class HtmlForm {
         return FormStatus.ACTIVE.equals(formStatus);
     }
 
-    public void addHtmlFormField(HtmlFormField htmlFormField) {
-        htmlFormFields.add(htmlFormField);
-        htmlFormField.setHtmlForm(this);
+    public AddFormFieldResult addHtmlFormField(HtmlFormField htmlFormField) {
+        // Checking if the new Field added in the form is Unique or not
+        String addingNewFieldWithName = htmlFormField.getName();
+
+        Optional<HtmlFormField> probableFormFieldWithSameNameAsCurrentOne = htmlFormFields.stream()
+                .filter(alreadyAddedFormField -> alreadyAddedFormField.fieldNameEqualsTo(addingNewFieldWithName))
+                .findFirst();
+
+        if (probableFormFieldWithSameNameAsCurrentOne.isEmpty()) {
+            htmlFormFields.add(htmlFormField);
+            htmlFormField.setHtmlForm(this);
+            return AddFormFieldResult.successResult();
+        }
+
+        // If probableFormFieldWithSameNameAsCurrentOne is not Empty means there is already a filed with the same name
+        String template = "Form Field With Name %s Already Exists In Form";
+        return AddFormFieldResult.failResult(template.formatted(addingNewFieldWithName));
     }
+
 
     public Optional<HtmlFormField> htmlFormFieldHavingName(String formFieldName) {
         return htmlFormFields.stream()

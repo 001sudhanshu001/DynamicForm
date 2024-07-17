@@ -2,6 +2,7 @@ package com.learn.service;
 
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
+import com.learn.dto.internal.AddFormFieldResult;
 import com.learn.dto.request.SubmitDynamicFormPayload;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
@@ -43,8 +44,17 @@ public class HtmlFormService {
         Long fieldBelongToFormId = htmlFormField.getFormId();
         HtmlForm htmlForm = htmlFormRepository.findById(fieldBelongToFormId)
                 .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", fieldBelongToFormId));
-        htmlForm.addHtmlFormField(htmlFormField);
+
+        // This will add the Field in the form is Field is Unique and AddFormFieldResult success will true
+        // Otherwise it will add failure message
+        AddFormFieldResult addFormFieldResult = htmlForm.addHtmlFormField(htmlFormField);
+
+        if(!addFormFieldResult.isSuccess()) {
+            // TODO : Implement Global Exception Handler to Handle the Exception and return a Proper response
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, addFormFieldResult.getFailMessage());
+        }
         HtmlForm updatedHtmlForm = htmlFormRepository.save(htmlForm);
+
         return updatedHtmlForm.htmlFormFieldHavingName(htmlFormField.getName()).orElseThrow();
     }
 
