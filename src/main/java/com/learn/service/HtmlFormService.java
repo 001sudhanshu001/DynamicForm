@@ -4,6 +4,7 @@ import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
 import com.learn.dto.internal.AddFormFieldResult;
 import com.learn.dto.internal.FieldStatusChangeResult;
+import com.learn.dto.internal.FieldValidationResult;
 import com.learn.dto.request.SubmitDynamicFormPayload;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
@@ -17,6 +18,7 @@ import com.learn.repository.UserRepository;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,34 +139,44 @@ public class HtmlFormService {
         List<String> invalidFormFields = submittedValuesForFields.stream() // Checking if the Fields sent in the Request are actually there in the form
                 .filter(fieldName -> htmlForm.htmlFormFieldHavingName(fieldName).isEmpty())
                 .toList();
-
         if (!invalidFormFields.isEmpty()) { // If there are some FormField sent in the request that are not in the DataBase Form, then throw exception
             throw new ApplicationException(HttpStatus.BAD_REQUEST, "Invalid FormFields Provided:: " + invalidFormFields);
         }
 
+        // If some fields are inactive and theses are sent as a request
         List<String> inActiveFieldSubmissions = submittedValuesForFields.stream()
                 .filter(fieldName -> htmlForm.htmlFormFieldHavingName(fieldName).isEmpty())
                 .toList();
-
         if (!inActiveFieldSubmissions.isEmpty()) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST,
                     "InActive Fields Submission:: " + inActiveFieldSubmissions
             );
         }
 
-        Map<String, Object> fieldValues = payload.getFieldValues();
-        Map<String, Boolean> failedValidationResults = new HashMap<>();
+        // If Required fields are not provided
+        Map<String, Object> fieldFromPayload = payload.getFieldValues();
+        Set<String> providedFields = fieldFromPayload.keySet();
+        Set<String> missingRequiredFields = htmlForm.missingRequiredFields(providedFields);
+        if (!missingRequiredFields.isEmpty()) {
+            throw new ApplicationException(
+                    HttpStatus.BAD_REQUEST,
+                    "Required Fields Missing In Submission:: " + missingRequiredFields
+            );
+        }
 
-        fieldValues.forEach((fieldName, fieldValue) -> {
-            // TODO : Validation and filling up of failedValidationResults
+        // Checking for each filed in the form if the value is within the Specified Rules
+        Set<String> failedValidationResults = new HashSet<>();
 
+        fieldFromPayload.forEach((fieldName, fieldValue) -> {
+            FieldValidationResult fieldValidationResult = htmlForm.validateFieldValue(fieldName, fieldValue);
+
+            if (!fieldValidationResult.isSuccess()) {
+                failedValidationResults.add(fieldValidationResult.toString());
+            }
         });
 
         if (!failedValidationResults.isEmpty()) {
-            throw new ApplicationException(
-                    HttpStatus.BAD_REQUEST,
-                    "InValid Values Found In Fields:: " + failedValidationResults.keySet()
-            );
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, failedValidationResults.toString());
         }
 
         User user = userRepository.getReferenceById(userId);

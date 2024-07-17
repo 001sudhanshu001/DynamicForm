@@ -4,6 +4,7 @@ import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
 import com.learn.dto.internal.AddFormFieldResult;
 import com.learn.dto.internal.FieldStatusChangeResult;
+import com.learn.dto.internal.FieldValidationResult;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +14,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter @Setter
@@ -113,6 +113,28 @@ public class HtmlForm {
         }
 
         return FieldStatusChangeResult.successResult();
+    }
+
+
+     /* -------------------- Validation ------------------ */
+
+    public Set<String> missingRequiredFields(Set<String> providedFields) {
+        Set<String> missingFields = new HashSet<>();
+        for (HtmlFormField field : htmlFormFields) {
+            if (field.isActive() && field.isMandatoryField() && !providedFields.contains(field.getName())) {
+                missingFields.add(field.getName());
+            }
+        }
+        return missingFields;
+    }
+
+    public FieldValidationResult validateFieldValue(String formFieldName, Object formFieldValue) {
+        return htmlFormFields.stream()
+                .filter(HtmlFormField::isActive)
+                .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
+                .map(htmlFormField -> htmlFormField.validateValue(formFieldValue)) // for each filed checking the value is valid or not
+                .toList()
+                .getFirst();
     }
 
     @Override

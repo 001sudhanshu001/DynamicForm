@@ -1,5 +1,7 @@
 package com.learn.entity;
 
+import com.learn.dto.internal.FieldValidationResult;
+import com.learn.entity.validator.TextTypeValueValidator;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormFieldValidationRule;
@@ -15,6 +17,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 @Entity
 @Table(name = "html_form_fields")
@@ -82,6 +85,28 @@ public class HtmlFormField {
         return FormFieldStatus.ACTIVE.equals(formFieldStatus);
     }
 
+    public boolean fieldNameEqualsTo(String fieldName) {
+        return StringUtils.equals(name, fieldName);
+    }
+
+    /* -------------------- Validation --------------------- */
+
+    // If the validationRules for this filed contains
+    public boolean isMandatoryField() {
+        return validationRules.containsKey(FormFieldValidationRule.REQUIRED) && Objects.equals(validationRules.get(FormFieldValidationRule.REQUIRED), "true");
+
+    }
+
+    public FieldValidationResult validateValue(Object formFieldValue) {
+        if (type.equals(InputType.TEXT)) {
+            String fieldValueAsString = formFieldValue != null ? String.valueOf(formFieldValue) : null;
+            TextTypeValueValidator textTypeValueValidator =
+                    new TextTypeValueValidator(name, validationRules, fieldValueAsString);
+            return textTypeValueValidator.validate();
+        }
+        return FieldValidationResult.builder().success(true).build();
+    }
+
     @Override
     public String toString() {
         return "HtmlFormField{" +
@@ -100,9 +125,5 @@ public class HtmlFormField {
                 ", version=" + version +
                 ", formId=" + formId +
                 '}';
-    }
-
-    public boolean fieldNameEqualsTo(String fieldName) {
-        return StringUtils.equals(name, fieldName);
     }
 }

@@ -46,11 +46,12 @@ public class HtmlFormController {
         return new ResponseEntity<>(htmlFormMapper.fromHtmlFormField(savedHtmlFormField), HttpStatus.CREATED);
     }
 
-    @PostMapping("/make-form-active/{formId}")
+    @PatchMapping("/make-form-active/{formId}")
     public ResponseEntity<?> makeFormActive(@PathVariable Long formId) {
         htmlFormService.makeFormActive(formId);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
+
 
     @PatchMapping("/make-form-field-active/{formId}/{formFieldId}")
     public ResponseEntity<?>  makeFormFieldActive(@PathVariable Long formId,

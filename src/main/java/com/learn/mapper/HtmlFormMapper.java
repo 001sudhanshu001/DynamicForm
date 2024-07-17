@@ -39,7 +39,6 @@ public class HtmlFormMapper {
         htmlFormResponse.setName(htmlForm.getName());
         htmlFormResponse.setRemark(htmlForm.getRemark());
         htmlFormResponse.setFormStatus(htmlForm.getFormStatus());
-        System.out.println("Before calling " + htmlForm.getHtmlFormFields());
         htmlFormResponse.setHtmlFormFields(htmlFormFieldSetToHtmlFormFieldResponseSet(htmlForm.getHtmlFormFields()));
 
         return htmlFormResponse;
