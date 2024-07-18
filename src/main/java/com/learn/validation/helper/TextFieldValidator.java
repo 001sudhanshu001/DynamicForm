@@ -2,7 +2,6 @@ package com.learn.validation.helper;
 
 import com.learn.constants.FormFieldValidationRule;
 import com.learn.dto.request.HtmlFormFieldCreationPayload;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.validation.Errors;
@@ -33,32 +32,13 @@ public class TextFieldValidator implements FieldValidator{
 
     @Override
     public void validate() {
-        validateRequiredRuleValidation();
+        //  It is Mandatory To Tell That Field Is Required Or Not
+        RequiredValidationChecker.validateRequiredRuleValidation(payload, errors);
 
         //validate if the ValidationRules are applicable to TEXT InputType
         validateApplicableRules();
 
         checkIfMinLengthIsLessThanMaxLength();
-    }
-
-    void validateRequiredRuleValidation() {
-        FormFieldValidationRule required = FormFieldValidationRule.REQUIRED;
-        String ruleValue = payload.getValidationRules().get(required);
-        if (StringUtils.isBlank(ruleValue)) {
-            errors.rejectValue(
-                    "validationRules[" + required + "]",
-                    "It is Mandatory To Tell That Field Is Required Or Not"
-            );
-            return;
-        }
-
-        CharSequence[] valuesThatWeCanConsiderAsBoolean = {"y", "n", "0", "1", "on", "off", "true", "false"};
-        if (!StringUtils.equalsAnyIgnoreCase(ruleValue, valuesThatWeCanConsiderAsBoolean)) {
-            errors.rejectValue(
-                    "validationRules["+ FormFieldValidationRule.REQUIRED.name()+"]",
-                    "Invalid Value Provided For " + FormFieldValidationRule.REQUIRED
-            );
-        }
     }
 
     private void validateApplicableRules() {

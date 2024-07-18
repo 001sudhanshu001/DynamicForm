@@ -23,7 +23,9 @@ public class CheckBoxTypeValidator implements FieldValidator {
 
     @Override
     public void validate() {
-        validateRequiredRuleValidation();
+        // It is Mandatory To Tell That Field Is Required Or Not
+        RequiredValidationChecker.validateRequiredRuleValidation(payload, errors);
+
         validateCheckBoxTypeFormField();
     }
 
@@ -38,27 +40,6 @@ public class CheckBoxTypeValidator implements FieldValidator {
             validateDisplayOptionsKeysAreUnique(displayOptions);
             // TODO : Similar to validateDisplayOptionsKeysAreUnique, validateDisplayOptionsValuesAreUnique
             //  can be implemented base on specific need
-        }
-    }
-
-    void validateRequiredRuleValidation() {
-        FormFieldValidationRule required = REQUIRED;
-        String ruleValue = payload.getValidationRules().get(required);
-
-        if (StringUtils.isBlank(ruleValue)) {
-            errors.rejectValue(
-                    "validationRules[" + required + "]",
-                    "It is Mandatory To Tell That Field Is Required Or Not"
-            );
-            return;
-        }
-
-        CharSequence[] valuesThatWeCanConsiderAsBoolean = {"y", "n", "0", "1", "on", "off", "true", "false"};
-        if (!StringUtils.equalsAnyIgnoreCase(ruleValue, valuesThatWeCanConsiderAsBoolean)) {
-            errors.rejectValue(
-                    "validationRules["+ REQUIRED.name()+"]",
-                    "Invalid Value Provided For " + REQUIRED
-            );
         }
     }
 

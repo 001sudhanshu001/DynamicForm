@@ -32,32 +32,11 @@ public class NumberTypeValidator implements FieldValidator{
 
     @Override
     public void validate() {
-        validateRequiredRuleValidation();
+        //  It is Mandatory To Tell That Field Is Required Or Not
+        RequiredValidationChecker.validateRequiredRuleValidation(payload, errors);
         validateApplicableRules();
         checkIfMinValueIsLessThanMaxValue();
     }
-
-    void validateRequiredRuleValidation() {
-        FormFieldValidationRule required = FormFieldValidationRule.REQUIRED;
-        String ruleValue = payload.getValidationRules().get(required);
-
-        if (StringUtils.isBlank(ruleValue)) {
-            errors.rejectValue(
-                    "validationRules[" + required + "]",
-                    "It is Mandatory To Tell That Field Is Required Or Not"
-            );
-            return;
-        }
-
-        CharSequence[] valuesThatWeCanConsiderAsBoolean = {"y", "n", "0", "1", "on", "off", "true", "false"};
-        if (!StringUtils.equalsAnyIgnoreCase(ruleValue, valuesThatWeCanConsiderAsBoolean)) {
-            errors.rejectValue(
-                    "validationRules["+ FormFieldValidationRule.REQUIRED.name()+"]",
-                    "Invalid Value Provided For " + FormFieldValidationRule.REQUIRED
-            );
-        }
-    }
-
 
     private void validateApplicableRules() {
         Map<FormFieldValidationRule, String> validationRules = payload.getValidationRules();

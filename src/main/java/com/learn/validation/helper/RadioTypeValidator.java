@@ -24,9 +24,14 @@ public class RadioTypeValidator implements FieldValidator{
 
     @Override
     public void validate() {
-        validateRequiredRuleValidation();
+        // It is Mandatory To Tell That Field Is Required Or Not
+        RequiredValidationChecker.validateRequiredRuleValidation(payload, errors);
 
-        validateIfProvidedValidationRulesAreCorrect();
+        validateRadioTypeFormField();
+    }
+
+    private void validateRadioTypeFormField() {
+       validateIfProvidedValidationRulesAreCorrect();
 
         if (payload.getDisplayOptions().isEmpty()) {
             errors.rejectValue("displayOptions", "DisplayOptions Required For RadioField");
@@ -38,27 +43,6 @@ public class RadioTypeValidator implements FieldValidator{
         //  can be implemented base on specific need
 
         validateDisplayOptionIsValid(payload.getDisplayOptions());
-    }
-
-    void validateRequiredRuleValidation() {
-        FormFieldValidationRule required = FormFieldValidationRule.REQUIRED;
-        String ruleValue = payload.getValidationRules().get(required);
-
-        if (StringUtils.isBlank(ruleValue)) {
-            errors.rejectValue(
-                    "validationRules[" + required + "]",
-                    "It is Mandatory To Tell That Field Is Required Or Not"
-            );
-            return;
-        }
-
-        CharSequence[] valuesThatWeCanConsiderAsBoolean = {"y", "n", "0", "1", "on", "off", "true", "false"};
-        if (!StringUtils.equalsAnyIgnoreCase(ruleValue, valuesThatWeCanConsiderAsBoolean)) {
-            errors.rejectValue(
-                    "validationRules["+ FormFieldValidationRule.REQUIRED.name()+"]",
-                    "Invalid Value Provided For " + FormFieldValidationRule.REQUIRED
-            );
-        }
     }
 
     private void validateIfProvidedValidationRulesAreCorrect() {
