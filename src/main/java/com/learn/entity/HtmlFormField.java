@@ -1,6 +1,7 @@
 package com.learn.entity;
 
 import com.learn.dto.internal.FieldValidationResult;
+import com.learn.entity.validator.CheckBoxTypeValueValidator;
 import com.learn.entity.validator.NumberTypeValueValidator;
 import com.learn.entity.validator.RadioTypeValueValidator;
 import com.learn.entity.validator.TextTypeValueValidator;
@@ -121,6 +122,11 @@ public class HtmlFormField {
                     new RadioTypeValueValidator(name, validationRules, displayOptions, formFieldValue);
 
             return radioTypeValueValidation.validate();
+        } else if (type.equals(InputType.CHECKBOX)) {
+            CheckBoxTypeValueValidator checkBoxTypeValueValidator =
+                    new CheckBoxTypeValueValidator(name, validationRules, displayOptions, formFieldValue);
+
+            return checkBoxTypeValueValidator.validate();
         }
 
         // TODO : Implementing rest of the field Validators
