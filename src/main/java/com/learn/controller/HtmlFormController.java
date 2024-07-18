@@ -56,7 +56,7 @@ public class HtmlFormController {
             Method method = HtmlFormController.class.getDeclaredMethod("addFormField", HtmlFormFieldCreationPayload.class);
             MethodParameter methodParameter = new MethodParameter(method, 0);
             BindingResult bindingResult = bindException.getBindingResult();
-            throw new MethodArgumentNotValidException(methodParameter, bindingResult);
+            throw new MethodArgumentNotValidException(methodParameter, bindingResult); // Handled in GlobalExceptionHandler
         }
 
         HtmlFormField htmlFormField = htmlFormMapper.fromHtmlFormFieldCreationPayload(payload);
