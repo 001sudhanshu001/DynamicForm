@@ -12,4 +12,10 @@ public class ExceptionHelperUtils {
         String errorMessage = String.format(notFoundErrorTemplate, whatNotFound);
         return () -> new ApplicationException(NOT_FOUND, errorMessage);
     }
+
+    public static Supplier<ApplicationException> notFoundException(Long id) {
+        return () -> new ApplicationException(
+                NOT_FOUND, "Data Not Found With Id:: " + id
+        );
+    }
 }
