@@ -10,9 +10,13 @@ public class FieldValidatorFactory {
     public static FieldValidator createValidatorFor(HtmlFormFieldCreationPayload payload, Errors errors) {
         InputType type = payload.getType();
 
+        if(type.equals(InputType.TEXT)) {
+            return new TextFieldValidator(payload, errors);
+        }
+
 
         // TODO : Implement Other Validators
 
-        return null;
+        return new NoOpValidator();
     }
 }
