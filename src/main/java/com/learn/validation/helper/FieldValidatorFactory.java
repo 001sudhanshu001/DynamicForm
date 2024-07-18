@@ -14,8 +14,12 @@ public class FieldValidatorFactory {
 
         if(type.equals(TEXT)) {
             return new TextFieldValidator(payload, errors);
-        }else if (NUMBER.equals(type)) {
+        } else if (NUMBER.equals(type)) {
             return new NumberTypeValidator(payload, errors);
+        } else if (RADIO.equals(type)) {
+            return new RadioTypeValidator(payload, errors);
+        } else if (CHECKBOX.equals(type)) {
+            return new CheckBoxTypeValidator(payload, errors);
         }
 
 
