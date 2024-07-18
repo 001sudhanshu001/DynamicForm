@@ -6,5 +6,8 @@ public enum FormFieldValidationRule {
     MAX_LENGTH,
     MIN_VALUE,
     MAX_VALUE,
-    PATTERN
+    PATTERN,
+
+    MIN_DATE, MAX_DATE, // for date fields
+    MIN_TIME, MAX_TIME // for time fields
 }
