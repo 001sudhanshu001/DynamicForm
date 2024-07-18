@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.util.*;
 @Entity
 @Getter @Setter
 @Table(name = "html_forms")
+@EntityListeners(AuditingEntityListener.class)
 public class HtmlForm {
 
     @Id
