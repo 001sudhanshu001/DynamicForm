@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public class TextTypeValueValidator {
+public class TextTypeValueValidator implements FieldValueValidator{
     private final String fieldName;
     private final Map<FormFieldValidationRule, String> validationRules;
     private final String formFieldValue;
@@ -20,6 +20,7 @@ public class TextTypeValueValidator {
     private FieldValidationResult result = FieldValidationResult.builder().success(true).build();
     private boolean tryNextValidation = true;
 
+    @Override
     public FieldValidationResult validate() {
         validateAgainstRequiredRule();
 

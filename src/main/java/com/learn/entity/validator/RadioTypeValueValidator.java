@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public class RadioTypeValueValidator {
+public class RadioTypeValueValidator implements FieldValueValidator{
     private final String fieldName;
     private final Map<FormFieldValidationRule, String> validationRules;
     private final Map<String, String> displayOptions;
@@ -18,6 +18,7 @@ public class RadioTypeValueValidator {
     private FieldValidationResult result = FieldValidationResult.builder().success(true).build();
     private boolean tryNextValidation = true;
 
+    @Override
     public FieldValidationResult validate() {
         validateAgainstRequiredRule();
 

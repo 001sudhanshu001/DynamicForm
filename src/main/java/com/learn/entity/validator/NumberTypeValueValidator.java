@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-public class NumberTypeValueValidator {
+public class NumberTypeValueValidator implements FieldValueValidator{
     private final String fieldName;
     private final Map<FormFieldValidationRule, String> validationRules;
     private final Object formFieldValue;
@@ -20,6 +20,7 @@ public class NumberTypeValueValidator {
     private FieldValidationResult result = FieldValidationResult.builder().success(true).build();
     private boolean tryNextValidation = true;
 
+    @Override
     public FieldValidationResult validate() {
         if (formFieldValue == null) {
             return validateValueAsNumber(null);

@@ -1,10 +1,7 @@
 package com.learn.entity;
 
 import com.learn.dto.internal.FieldValidationResult;
-import com.learn.entity.validator.CheckBoxTypeValueValidator;
-import com.learn.entity.validator.NumberTypeValueValidator;
-import com.learn.entity.validator.RadioTypeValueValidator;
-import com.learn.entity.validator.TextTypeValueValidator;
+import com.learn.entity.validator.*;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormFieldValidationRule;
@@ -98,7 +95,7 @@ public class HtmlFormField {
 
     /* -------------------- Validation --------------------- */
 
-    // If the validationRules for this filed contains
+    // If the validationRules for this filed contains REQUIRED
     public boolean isMandatoryField() {
         return validationRules.containsKey(FormFieldValidationRule.REQUIRED)
                 && Objects.equals(validationRules.get(FormFieldValidationRule.REQUIRED), "true");
@@ -106,24 +103,32 @@ public class HtmlFormField {
     }
 
     public FieldValidationResult validateValue(Object formFieldValue) {
+        FieldValueValidator fieldValueValidator =
+                FieldValueValidatorFactory.createValidatorFor(this, formFieldValue);
+
+        return fieldValueValidator.validate();
+    }
+
+    /*
+    public FieldValidationResult validateValue(Object formFieldValue) {
         if (type.equals(InputType.TEXT)) {
             String fieldValueAsString = formFieldValue != null ? String.valueOf(formFieldValue) : null;
-            TextTypeValueValidator textTypeValueValidator =
+            FieldValueValidator textTypeValueValidator =
                     new TextTypeValueValidator(name, validationRules, fieldValueAsString);
 
             return textTypeValueValidator.validate();
         } else if (type.equals(InputType.NUMBER)) {
-            NumberTypeValueValidator numberTypeValueValidation =
+            FieldValueValidator numberTypeValueValidation =
                     new NumberTypeValueValidator(name, validationRules, formFieldValue);
 
             return numberTypeValueValidation.validate();
         }else if (type.equals(InputType.RADIO)) {
-            RadioTypeValueValidator radioTypeValueValidation =
+            FieldValueValidator radioTypeValueValidation =
                     new RadioTypeValueValidator(name, validationRules, displayOptions, formFieldValue);
 
             return radioTypeValueValidation.validate();
         } else if (type.equals(InputType.CHECKBOX)) {
-            CheckBoxTypeValueValidator checkBoxTypeValueValidator =
+            FieldValueValidator checkBoxTypeValueValidator =
                     new CheckBoxTypeValueValidator(name, validationRules, displayOptions, formFieldValue);
 
             return checkBoxTypeValueValidator.validate();
@@ -132,6 +137,7 @@ public class HtmlFormField {
         // TODO : Implementing rest of the field Validators
         return FieldValidationResult.builder().success(true).build();
     }
+     */
 
     @Override
     public String toString() {

@@ -1,6 +1,5 @@
 package com.learn.entity.validator;
 
-
 import com.learn.constants.FormFieldValidationRule;
 import com.learn.dto.internal.FieldValidationResult;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class CheckBoxTypeValueValidator {
+public class CheckBoxTypeValueValidator implements FieldValueValidator{
     private final String fieldName;
     private final Map<FormFieldValidationRule, String> validationRules;
     private final Map<String, String> displayOptions;
@@ -19,6 +18,7 @@ public class CheckBoxTypeValueValidator {
     private FieldValidationResult result = FieldValidationResult.builder().success(true).build();
     private boolean tryNextValidation = true;
 
+    @Override
     public FieldValidationResult validate() {
         validateValueType();
         if (tryNextValidation) {
@@ -68,7 +68,7 @@ public class CheckBoxTypeValueValidator {
         String requiredOrNot = validationRules.get(FormFieldValidationRule.REQUIRED);
         boolean required = BooleanUtils.toBoolean(requiredOrNot);
 
-        if (BooleanUtils.isNotTrue(required)) {
+        if (!required) {
             // do not check value if not required
             return;
         }
