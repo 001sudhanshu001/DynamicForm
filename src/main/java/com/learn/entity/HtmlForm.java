@@ -15,16 +15,10 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter @Setter
-@Table(
-        name = "html_forms",
-        indexes = {
-                @Index(name = "html_form_name_unique_idx", columnList = "name", unique = true)
-        }
-)
+@Table(name = "html_forms")
 public class HtmlForm {
 
     @Id
