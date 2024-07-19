@@ -30,9 +30,15 @@ public class FieldValueValidatorFactory {
             Map<String, String> displayOptions = formField.getDisplayOptions();
 
             return new CheckBoxTypeValueValidator(name, validationRules, displayOptions, formFieldValue);
+        } else if (type.equals(InputType.DATE)) {
+            return new DateValueValidator(name, validationRules, getFieldValueAsString(formFieldValue));
         }
         // TODO if field type does not match then
         return new NoOpValueValidator();
+    }
+
+    private static String getFieldValueAsString(Object formFieldValue) {
+        return formFieldValue != null ? String.valueOf(formFieldValue) : null;
     }
 
 }
