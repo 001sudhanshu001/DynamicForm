@@ -6,15 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
-import java.util.Objects;
 
 @RequiredArgsConstructor
-public class DateValueValidator implements FieldValueValidator {
-
+public class DateTimeValueValidator implements FieldValueValidator{
     private final String fieldName;
     private final Map<FormFieldValidationRule, String> validationRules;
     private final String formFieldValue;
@@ -27,19 +24,19 @@ public class DateValueValidator implements FieldValueValidator {
         validateAgainstRequiredRule();
 
         if (tryNextValidation) {
-            validateProvidedValueIsParsableDate();
+            validateProvidedValueIsParsableDateTime();
         } else {
             return result;
         }
 
         if (tryNextValidation) {
-            validateAgainstMinDateRule();
+            validateAgainstMinDateTimeRule();
         } else {
             return result;
         }
 
         if (tryNextValidation) {
-            validateAgainstMaxDateRule();
+            validateAgainstMaxDateTimeRule();
         } else {
             return result;
         }
@@ -50,6 +47,7 @@ public class DateValueValidator implements FieldValueValidator {
     private void validateAgainstRequiredRule() {
         String validationValue = validationRules.get(FormFieldValidationRule.REQUIRED);
 
+        // Value is required but not Provided
         if (BooleanUtils.toBoolean(validationValue) && StringUtils.isBlank(formFieldValue)) {
             result = FieldValidationResult.builder()
                     .success(false)
@@ -60,14 +58,14 @@ public class DateValueValidator implements FieldValueValidator {
         }
     }
 
-    private void validateProvidedValueIsParsableDate() {
+    private void validateProvidedValueIsParsableDateTime() {
         if (StringUtils.isBlank(formFieldValue)) {
             return;
         }
         try {
             LocalDateTime.parse(formFieldValue);
         } catch (DateTimeParseException parseException) {
-            String failMessage = "Provided Value [%s] Is Not A Valid Date".formatted(formFieldValue);
+            String failMessage = "Provided Value [%s] Is Not A Valid DateTime".formatted(formFieldValue);
             result = FieldValidationResult.builder()
                     .success(false)
                     .fieldName(fieldName)
@@ -77,20 +75,17 @@ public class DateValueValidator implements FieldValueValidator {
         }
     }
 
-    private void validateAgainstMinDateRule() {
-        String validationValue = validationRules.get(FormFieldValidationRule.MIN_DATE);
-        if (Objects.isNull(formFieldValue)) {
+    private void validateAgainstMinDateTimeRule() {
+        if (StringUtils.isBlank(formFieldValue)) {
             return;
         }
-        if (StringUtils.isBlank(validationValue)) {
-            // no min date validation rule provided on creation
-            return;
-        }
-        LocalDate minDateShouldBe = LocalDate.parse(validationValue);
-        LocalDate actualDateProvided = LocalDate.parse(formFieldValue);
-        if (actualDateProvided.isBefore(minDateShouldBe)) {
-            String failMessage = "%s Field Required Minimum Date %s But Found %s".formatted(
-                    fieldName, minDateShouldBe, actualDateProvided
+
+        String minDateTimeRule =
+                validationRules.get(FormFieldValidationRule.MIN_DATE_TIME);
+
+        if (BooleanUtils.isNotTrue(isMinDateTimeValid(LocalDateTime.parse(formFieldValue), minDateTimeRule))) {
+            String failMessage = "%s Field Required Minimum DateTime %s But Found %s".formatted(
+                    fieldName, minDateTimeRule, formFieldValue
             );
             result = FieldValidationResult.builder().success(false)
                     .fieldName(fieldName)
@@ -100,20 +95,15 @@ public class DateValueValidator implements FieldValueValidator {
         }
     }
 
-    private void validateAgainstMaxDateRule() {
-        String validationValue = validationRules.get(FormFieldValidationRule.MAX_DATE);
-        if (Objects.isNull(formFieldValue)) {
+    private void validateAgainstMaxDateTimeRule() {
+        if (StringUtils.isBlank(formFieldValue)) {
             return;
         }
-        if (StringUtils.isBlank(validationValue)) {
-            // no max date validation rule provided on creation
-            return;
-        }
-        LocalDate maxDateShouldBe = LocalDate.parse(validationValue);
-        LocalDate actualDateProvided = LocalDate.parse(formFieldValue);
-        if (actualDateProvided.isAfter(maxDateShouldBe)) {
-            String failMessage = "%s Field Required Maximum Date %s But Found %s".formatted(
-                    fieldName, maxDateShouldBe, actualDateProvided
+        String maxDateTimeRule = validationRules.get(FormFieldValidationRule.MAX_DATE_TIME);
+
+        if (BooleanUtils.isNotTrue(isMaxDateTimeValid(LocalDateTime.parse(formFieldValue), maxDateTimeRule))) {
+            String failMessage = "%s Field Required Maximum DateTime %s But Found %s".formatted(
+                    fieldName, maxDateTimeRule, formFieldValue
             );
             result = FieldValidationResult.builder()
                     .success(false)
@@ -123,4 +113,26 @@ public class DateValueValidator implements FieldValueValidator {
             tryNextValidation = false;
         }
     }
+
+    public boolean isMaxDateTimeValid(LocalDateTime providedDateTime, String maxDateTimeRule) {
+        if (StringUtils.isBlank(maxDateTimeRule)) {
+            return true;
+        }
+
+        LocalDateTime maxLocalDateTimeAllowed = LocalDateTime.parse(maxDateTimeRule);
+        return providedDateTime.isBefore(maxLocalDateTimeAllowed) ||
+               providedDateTime.isEqual(maxLocalDateTimeAllowed);
+
+    }
+
+    public boolean isMinDateTimeValid(LocalDateTime providedDateTime, String minDateTimeRule) {
+        if (StringUtils.isBlank(minDateTimeRule)) {
+            return true;
+        }
+
+        LocalDateTime minLocalDateTimeAllowed = LocalDateTime.parse(minDateTimeRule);
+        return providedDateTime.isAfter(minLocalDateTimeAllowed) ||
+                providedDateTime.isEqual(minLocalDateTimeAllowed);
+    }
+
 }

@@ -32,6 +32,10 @@ public class FieldValueValidatorFactory {
             return new CheckBoxTypeValueValidator(name, validationRules, displayOptions, formFieldValue);
         } else if (type.equals(InputType.DATE)) {
             return new DateValueValidator(name, validationRules, getFieldValueAsString(formFieldValue));
+        } else if (type.equals(InputType.TIME)) {
+            return new TimeValueValidator(name, validationRules, getFieldValueAsString(formFieldValue));
+        } else if (type.equals(InputType.DATETIME_LOCAL)) {
+            return new DateTimeValueValidator(name, validationRules, getFieldValueAsString(formFieldValue));
         }
         // TODO if field type does not match then
         return new NoOpValueValidator();
