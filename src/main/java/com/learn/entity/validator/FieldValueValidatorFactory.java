@@ -36,8 +36,10 @@ public class FieldValueValidatorFactory {
             return new TimeValueValidator(name, validationRules, getFieldValueAsString(formFieldValue));
         } else if (type.equals(InputType.DATETIME_LOCAL)) {
             return new DateTimeValueValidator(name, validationRules, getFieldValueAsString(formFieldValue));
+        }  else if (type.equals(InputType.FILE)) {
+            return new FileTypeValueValidator(name, validationRules, formFieldValue);
         }
-        // TODO if field type does not match then
+        // TODO : Implementation of FileTypeValidator
         return new NoOpValueValidator();
     }
 
