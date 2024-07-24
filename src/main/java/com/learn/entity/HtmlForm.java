@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Entity
 @Getter @Setter
@@ -55,7 +56,7 @@ public class HtmlForm {
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL
     )
-    private Set<HtmlFormField> htmlFormFields = new LinkedHashSet<>();
+    private Set<HtmlFormField> htmlFormFields = new HashSet<>();
 
     @OneToMany(mappedBy = "htmlForm", fetch = FetchType.LAZY)
     private Set<FilledHtmlForm> filledHtmlForms;
@@ -87,6 +88,13 @@ public class HtmlForm {
     public Optional<HtmlFormField> htmlFormFieldHavingName(String formFieldName) {
         return htmlFormFields.stream()
                 .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
+                .findFirst();
+    }
+
+    public Optional<HtmlFormField> htmlFormFieldHavingName(String formFieldName, Predicate<HtmlFormField> predicate) {
+        return htmlFormFields.stream()
+                .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
+                .filter(predicate)
                 .findFirst();
     }
 

@@ -15,7 +15,6 @@ import com.learn.service.HtmlFormService;
 import com.learn.validation.HtmlFormFieldCreationValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -70,7 +69,6 @@ public class HtmlFormController {
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 
-
     @PatchMapping("/make-form-field-active/{formId}/{formFieldId}")
     public ResponseEntity<?>  makeFormFieldActive(@PathVariable Long formId,
                                                   @PathVariable Long formFieldId) {
@@ -98,5 +96,11 @@ public class HtmlFormController {
     public ResponseEntity<FilledHtmlFormResponse> submitForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
         FilledHtmlForm filledHtmlForm = htmlFormService.submitForm(payload);
         return new ResponseEntity<>(new FilledHtmlFormResponse(filledHtmlForm), HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/update-form")
+    public ResponseEntity<?> updateForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
+        FilledHtmlForm filledHtmlForm = htmlFormService.updateForm(payload);
+        return null;
     }
 }

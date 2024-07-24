@@ -87,7 +87,7 @@ public class HtmlFormService {
         htmlFormRepository.save(htmlForm);
     }
 
-    @Transactional // To make filed active and inactive
+    @Transactional
     public void changeFormFieldStatus(Long formId, Long formFieldId, boolean requestToMakeActive) {
         HtmlForm htmlForm = htmlFormRepository.findById(formId)
                 .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
@@ -112,7 +112,7 @@ public class HtmlFormService {
     }
 
     public HtmlForm fetchFormToFill(Long formId) {
-        HtmlForm htmlForm = htmlFormRepository.findById(formId)
+        HtmlForm htmlForm = htmlFormRepository.getHtmlFormWithActiveFormFields(formId, FormFieldStatus.ACTIVE)
                 .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
 
         if (!htmlForm.isActive()) {
@@ -129,6 +129,39 @@ public class HtmlFormService {
         HtmlForm htmlForm = htmlFormRepository.findById(formId)
                 .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
 
+        validateSubmittedForm(payload, htmlForm);
+
+        User user = userRepository.getReferenceById(userId);
+
+        FilledHtmlForm filledHtmlForm = new FilledHtmlForm();
+        filledHtmlForm.setUser(user);
+        filledHtmlForm.setHtmlForm(htmlForm);
+        filledHtmlForm.setFormFieldValues(payload.getFieldValues());
+
+        return filledHtmlFormRepository.save(filledHtmlForm);
+    }
+
+    @Transactional
+    public FilledHtmlForm updateForm(SubmitDynamicFormPayload payload) {
+        Long formId = payload.getFormId();
+        Optional<FilledHtmlForm> optionalFilledHtmlForm =
+                filledHtmlFormRepository.findByFormIdAndUserId(formId, payload.getUserId());
+        if (optionalFilledHtmlForm.isEmpty()) {
+            throw new ApplicationException(HttpStatus.NOT_FOUND, "FilledHtmlForm Not Found");
+        }
+
+        HtmlForm htmlForm = htmlFormRepository.findById(formId)
+                .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
+
+        validateSubmittedForm(payload, htmlForm);
+
+        FilledHtmlForm filledHtmlForm = optionalFilledHtmlForm.get();
+        filledHtmlForm.setFormFieldValues(payload.getFieldValues());
+
+        return filledHtmlFormRepository.save(filledHtmlForm);
+    }
+
+    private void validateSubmittedForm(SubmitDynamicFormPayload payload, HtmlForm htmlForm) {
         if (!htmlForm.isActive()) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST,
                     "HtmlForm Is Not In Active State, Can't Accept Submission"
@@ -145,7 +178,7 @@ public class HtmlFormService {
 
         // If some fields are inactive and theses are sent as a request
         List<String> inActiveFieldSubmissions = submittedValuesForFields.stream()
-                .filter(fieldName -> htmlForm.htmlFormFieldHavingName(fieldName).isEmpty())
+                .filter(fieldName -> htmlForm.htmlFormFieldHavingName(fieldName, HtmlFormField::isActive).isEmpty())
                 .toList();
         if (!inActiveFieldSubmissions.isEmpty()) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST,
@@ -178,15 +211,5 @@ public class HtmlFormService {
         if (!failedValidationResults.isEmpty()) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST, failedValidationResults.toString());
         }
-
-        User user = userRepository.getReferenceById(userId);
-
-        FilledHtmlForm filledHtmlForm = new FilledHtmlForm();
-        filledHtmlForm.setUser(user);
-        filledHtmlForm.setHtmlForm(htmlForm);
-        filledHtmlForm.setFormFieldValues(payload.getFieldValues());
-
-        return filledHtmlFormRepository.save(filledHtmlForm);
     }
-
 }
