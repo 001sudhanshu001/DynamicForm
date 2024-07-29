@@ -20,9 +20,11 @@ public class JwtTokenProperty {
 
     public static final String AUTHORITY_KEY = "role";
 
-    public static final Integer ALLOWED_SESSION_COUNT = 1;
+    // Allowed Session Count and AutoLogout, properties can be added to specify user,
+    // allow them to configure setting based on their needs
+    public static final Integer ALLOWED_SESSION_COUNT = 4;
 
-    private boolean autoLogoutFromOtherDeviceOnOverflowSessionCount = true;
+    public static boolean AutoLogoutFromOtherDeviceOnOverflowSessionCount = true;
 
     private static Duration bearerTokenExpiration = Duration.of(5, ChronoUnit.MINUTES);
 

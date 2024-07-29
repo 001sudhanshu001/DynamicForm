@@ -125,4 +125,19 @@ public class JwtService {
     }
 
 
+    public Date getTokenExpiryFromExpiredJWT(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(signatureKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getExpiration();
+        } catch (ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            return claims.getExpiration();
+        }
+    }
+
 }

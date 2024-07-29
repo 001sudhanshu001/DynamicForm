@@ -2,6 +2,7 @@ package com.learn.controller;
 
 import com.learn.security.dto.JwtAuthenticationResponse;
 import com.learn.security.dto.SignUpRequest;
+import com.learn.security.dto.SigninRequest;
 import com.learn.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,14 @@ public class AuthenticationController {
             @RequestBody @Valid SignUpRequest request) {
 
         return ResponseEntity.ok(authenticationService.signup(request));
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<JwtAuthenticationResponse> signin(
+            @RequestBody @Valid SigninRequest request) {
+        JwtAuthenticationResponse jwtAuthenticationResponse = authenticationService.signin(request);
+
+        // TODO : Can trigger Logout for other Sessions
+        return ResponseEntity.ok(jwtAuthenticationResponse);
     }
 }
