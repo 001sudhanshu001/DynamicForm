@@ -1,6 +1,5 @@
 package com.learn.dto.dynamicfilter;
 
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.learn.dto.dynamicfilter.filtervaluetype.WhereClauseValue;
