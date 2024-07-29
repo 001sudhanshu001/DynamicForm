@@ -3,8 +3,7 @@ package com.learn.entity;
 import com.learn.constants.TableNames;
 import com.learn.enums.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Set;
@@ -16,15 +15,15 @@ import java.util.Set;
 )
 @Entity
 @Getter @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AppUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Column(name = "name", nullable = false)
-    private String name;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
