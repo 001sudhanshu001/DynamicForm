@@ -1,6 +1,7 @@
 package com.learn.service;
 
 import com.github.f4b6a3.ulid.Ulid;
+import com.github.f4b6a3.ulid.UlidCreator;
 import com.learn.entity.AppUser;
 import com.learn.entity.UserSession;
 import com.learn.enums.Role;
@@ -8,13 +9,11 @@ import com.learn.enums.TokenType;
 import com.learn.properties.JwtTokenProperty;
 import com.learn.repository.UserRepository;
 import com.learn.repository.UserSessionDetailRepository;
-import com.learn.security.dto.JwtAuthenticationResponse;
-import com.learn.security.dto.SignUpRequest;
-import com.learn.security.dto.SigninRequest;
-import com.learn.security.dto.UserDetailsImpl;
+import com.learn.security.dto.*;
 import com.learn.security.exception.JwtSecurityException;
 import com.learn.security.helper.SessionCreationHelper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static com.learn.security.exception.JwtSecurityException.JWTErrorCode.REFRESH_TOKEN_ONLY_ALLOWED_WITH_EXPIRED_TOKEN;
 
 @Service
 @Transactional
@@ -167,4 +168,100 @@ public class AuthenticationService {
 
         return List.of();
     }
+
+    @Transactional
+    public JwtAuthenticationResponse refresh(RefreshTokenRequest refreshTokenRequest) {
+        String accessToken = refreshTokenRequest.getAccessToken();
+        throwExceptionIfAccessTokenIsNotExpired(accessToken);
+
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+        validateRefreshTokenAsULID(refreshToken);
+
+        String userName = jwtService.getUserNameFromJWT(accessToken);
+        AppUser user = userRepository.findByEmail(userName).orElseThrow(
+                () -> new JwtSecurityException(
+                        JwtSecurityException.JWTErrorCode.USER_NOT_FOUND,
+                        "User Not Found"
+                )
+        );
+
+        List<UserSession> userSessions = user.getUserSessions();
+
+        Optional<UserSession> oldSession = findInOldSessions(
+                userSessions, accessToken, refreshToken
+        );
+
+        if (oldSession.isEmpty()) {
+            throw new JwtSecurityException(
+                    JwtSecurityException.JWTErrorCode.SESSION_NOT_FOUND,
+                    "User Session For Refresh Not Found With Given Tokens"
+            );
+        }
+
+        UserSession sessionToUpdate = oldSession.get();
+        Date refreshTokenExpiryDate = sessionToUpdate.getRefreshTokenExpiryDate();
+
+        if(refreshTokenExpiryDate.before(new Date())) {
+            throw new JwtSecurityException(
+                    JwtSecurityException.JWTErrorCode.REFRESH_TOKEN_EXPIRED,
+                    "Refresh Token Is Expired, Create New Login Request"
+            );
+        }
+
+        String newAccessToken = jwtService.generateAccessToken(new UserDetailsImpl(user));
+        Ulid newRefreshToken = UlidCreator.getUlid(refreshTokenExpiryDate.getTime());
+
+        sessionToUpdate.setActiveAccessToken(newAccessToken);
+        sessionToUpdate.setActiveRefreshToken(newRefreshToken.toString());
+        sessionToUpdate.setLastModifiedDate(new Date());
+        sessionToUpdate.increaseTokenRefreshCount();
+
+        userSessionDetailRepository.save(sessionToUpdate);
+
+        return JwtAuthenticationResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken.toString())
+                .build();
+    }
+
+    private void throwExceptionIfAccessTokenIsNotExpired(String accessToken) {
+        Date accessTokenExpiredAt = jwtService.getTokenExpiryFromExpiredJWT(accessToken);
+        if (accessTokenExpiredAt.after(new Date())) {
+            throw new JwtSecurityException(
+                    REFRESH_TOKEN_ONLY_ALLOWED_WITH_EXPIRED_TOKEN,
+                    "Refreshing The Token Is Only Allowed When Access Token Is Expired"
+            );
+        }
+    }
+
+    private static void validateRefreshTokenAsULID(String refreshToken) {
+        if (!Ulid.isValid(refreshToken)) {
+            throw new JwtSecurityException(
+                    JwtSecurityException.JWTErrorCode.INVALID_REFRESH_TOKEN,
+                    "Invalid Refresh Token Provided"
+            );
+        }
+
+        Date refreshTokenValidity = new Date(Ulid.from(refreshToken).getTime());
+        if (refreshTokenValidity.before(new Date())) {
+            throw new JwtSecurityException(
+                    JwtSecurityException.JWTErrorCode.REFRESH_TOKEN_EXPIRED,
+                    "Refresh Token Is Expired, Create New Login Request"
+            );
+        }
+    }
+
+    private Optional<UserSession> findInOldSessions(List<UserSession> oldSessions,
+                                                    String accessToken, String refreshToken) {
+
+        return oldSessions.stream()
+                .filter(userSessionDetail -> {
+                    String activeAccessToken = userSessionDetail.getActiveAccessToken();
+                    String activeRefreshToken = userSessionDetail.getActiveRefreshToken();
+
+                    return StringUtils.equals(accessToken, activeAccessToken) &&
+                            StringUtils.equals(refreshToken, activeRefreshToken);
+                }).findFirst();
+    }
+
 }

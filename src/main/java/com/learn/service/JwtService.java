@@ -4,6 +4,7 @@ import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.learn.enums.TokenType;
 import com.learn.properties.JwtTokenProperty;
+import com.learn.security.dto.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -140,4 +141,30 @@ public class JwtService {
         }
     }
 
+    public String getUserNameFromJWT(String token) {
+        try{
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(signatureKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getSubject();
+        } catch(ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            return claims.getSubject();
+        }
+    }
+
+    public String generateAccessToken(UserDetailsImpl userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        String authorities = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        extraClaims.put(JwtTokenProperty.AUTHORITY_KEY, authorities);
+        return getAccessToken(extraClaims, userDetails, System.currentTimeMillis());
+    }
 }

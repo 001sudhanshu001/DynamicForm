@@ -34,7 +34,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(configurer -> configurer.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/v1/auth/signup", "/api/v1/auth/signin").permitAll()
+                        request -> request.requestMatchers("/api/v1/auth/signup", "/api/v1/auth/signin",
+                                "/api/v1/auth/refresh").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

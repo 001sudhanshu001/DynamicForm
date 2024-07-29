@@ -1,6 +1,7 @@
 package com.learn.controller;
 
 import com.learn.security.dto.JwtAuthenticationResponse;
+import com.learn.security.dto.RefreshTokenRequest;
 import com.learn.security.dto.SignUpRequest;
 import com.learn.security.dto.SigninRequest;
 import com.learn.service.AuthenticationService;
@@ -34,5 +35,11 @@ public class AuthenticationController {
 
         // TODO : Can trigger Logout for other Sessions
         return ResponseEntity.ok(jwtAuthenticationResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtAuthenticationResponse> refresh(
+            @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+        return ResponseEntity.ok(authenticationService.refresh(refreshTokenRequest));
     }
 }
