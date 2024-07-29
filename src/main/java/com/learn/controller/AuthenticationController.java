@@ -34,6 +34,16 @@ public class AuthenticationController {
         return ResponseEntity.ok(jwtAuthenticationResponse);
     }
 
+    @PostMapping("/signin-exclusively")
+    public ResponseEntity<JwtAuthenticationResponse> signInExclusively(
+            @RequestBody @Valid SigninRequest request) {
+        JwtAuthenticationResponse jwtAuthenticationResponse =
+                authenticationService.signinExclusively(request);
+
+        // TODO : Trigger Logout Event for others
+        return ResponseEntity.ok(jwtAuthenticationResponse);
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthenticationResponse> refresh(
             @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
