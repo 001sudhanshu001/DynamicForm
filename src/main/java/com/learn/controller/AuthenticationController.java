@@ -1,9 +1,6 @@
 package com.learn.controller;
 
-import com.learn.security.dto.JwtAuthenticationResponse;
-import com.learn.security.dto.RefreshTokenRequest;
-import com.learn.security.dto.SignUpRequest;
-import com.learn.security.dto.SigninRequest;
+import com.learn.security.dto.*;
 import com.learn.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +38,14 @@ public class AuthenticationController {
     public ResponseEntity<JwtAuthenticationResponse> refresh(
             @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(authenticationService.refresh(refreshTokenRequest));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(@Valid @RequestBody LogOutRequest logOutRequest) {
+        String userName = authenticationService.logout(logOutRequest);
+
+        // TODO : Publish Event
+
+        return ResponseEntity.ok("User has successfully logged out from the system!");
     }
 }

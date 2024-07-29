@@ -264,4 +264,45 @@ public class AuthenticationService {
                 }).findFirst();
     }
 
+    // Other Solution :: Since /logout url is secured, so we can get username from security context
+    // Which we set in the JWTAuthenticationFilter, then there is no need for LogOutRequest object. Like the following
+//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.isAuthenticated()) {
+//        return authentication.getName();
+//    }
+    @Transactional
+    public String logout(LogOutRequest logOutRequest) {
+        String accessToken = logOutRequest.getAccessToken();
+        String refreshToken = logOutRequest.getRefreshToken();
+
+        // Since /logout url is secured, so in JWT the userName will be valid which will be in DB also
+        String userName = jwtService.getUserNameFromJWT(accessToken);
+
+        AppUser user = userRepository.findByEmail(userName).orElseThrow(() ->
+                new JwtSecurityException(
+                        JwtSecurityException.JWTErrorCode.USER_NOT_FOUND,
+                        "User Not Found With UserName:: "
+                )
+        );
+
+        List<UserSession> sessions = user.getUserSessions();
+
+        Optional<UserSession> optionalUserSessionDetail = findInOldSessions(sessions, accessToken, refreshToken);
+
+        if (optionalUserSessionDetail.isEmpty()) {
+            throw new JwtSecurityException(
+                    JwtSecurityException.JWTErrorCode.SESSION_NOT_FOUND,
+                    "User Session Not Found"
+            );
+        }
+
+        UserSession session = optionalUserSessionDetail.get();
+
+        // TODO : Even after deleting the session the User will be allowed to access Resource
+        //  for token expiration duration. This is something we have to bear as per the business needs,
+        //  Because for each request we can't validate the Token from the DB
+        userSessionDetailRepository.delete(session);
+
+        return userName;
+    }
 }

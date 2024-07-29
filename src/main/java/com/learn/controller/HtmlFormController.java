@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -87,6 +89,13 @@ public class HtmlFormController {
 
     @GetMapping("/fetch-form-to-fill/{formId}")
     public ResponseEntity<?> fetchFormToFill(@PathVariable Long formId) {
+        // TODO : Validate id this Form belongs to this user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName;
+        if (authentication != null && authentication.isAuthenticated()) {
+            userName = authentication.getName();
+        }
+
         HtmlForm htmlForm = htmlFormService.fetchFormToFill(formId);
         HtmlFormResponse htmlFormResponse = htmlFormMapper.fromHtmlForm(htmlForm);
         return ResponseEntity.ok(htmlFormResponse);
