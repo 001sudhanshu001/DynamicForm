@@ -41,7 +41,7 @@ public class FilledHtmlForm {
 
     @ManyToOne
     @JoinColumn(name = "filled_by_user_id", nullable = false, updatable = false)
-    private User user;
+    private AppUser appUser;
 
     @Type(JsonType.class)
     @Column(name = "form_field_values", columnDefinition = "json", nullable = false)

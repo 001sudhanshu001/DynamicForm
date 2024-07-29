@@ -9,7 +9,7 @@ import com.learn.dto.request.SubmitDynamicFormPayload;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
 import com.learn.entity.HtmlFormField;
-import com.learn.entity.User;
+import com.learn.entity.AppUser;
 import com.learn.exception.ApplicationException;
 import com.learn.repository.FilledHtmlFormRepository;
 import com.learn.repository.HtmlFormFieldRepository;
@@ -18,7 +18,6 @@ import com.learn.repository.UserRepository;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,10 +130,10 @@ public class HtmlFormService {
 
         validateSubmittedForm(payload, htmlForm);
 
-        User user = userRepository.getReferenceById(userId);
+        AppUser appUser = userRepository.getReferenceById(userId);
 
         FilledHtmlForm filledHtmlForm = new FilledHtmlForm();
-        filledHtmlForm.setUser(user);
+        filledHtmlForm.setAppUser(appUser);
         filledHtmlForm.setHtmlForm(htmlForm);
         filledHtmlForm.setFormFieldValues(payload.getFieldValues());
 
