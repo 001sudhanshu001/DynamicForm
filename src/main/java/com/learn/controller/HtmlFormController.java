@@ -171,7 +171,7 @@ public class HtmlFormController {
 
     @PostMapping("/update-form") // This is to update the filled form
     public ResponseEntity<?> updateForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
-        // TODO : The form will be submitted by a Student, Create Student Entity and update accordingly
+            // TODO : The form will be `submitted` by a Student, Create Student Entity and update accordingly
         String userName = getAuthenticatedUserName();
         boolean whetherFormBelongsToThisUser =
                 htmlFormService.checkWhetherFormBelongsToThisUser(userName, payload.getFormId());

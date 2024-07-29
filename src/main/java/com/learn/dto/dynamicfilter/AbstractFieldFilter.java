@@ -1,0 +1,26 @@
+package com.learn.dto.dynamicfilter;
+
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.learn.dto.dynamicfilter.filtervaluetype.WhereClauseValue;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "fieldType"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = TextTypeFieldFilter.class, name = "TEXT")
+})
+public abstract class AbstractFieldFilter {
+    public static final String PARAMETER_INDEX_INDICATOR = "_________index_________";
+    public static final String COLUMN_NAME_INDICATOR = "_________columnName_________";
+    public static final int REQUIRED_FILTER_VALUES_COUNT_FOR_BETWEEN = 2;
+
+    public abstract boolean isFilterable();
+    public abstract WhereClauseValue getFilterValue();
+    public abstract String getFieldName();
+
+    public abstract Object getOperation();
+
+}
