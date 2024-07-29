@@ -1,15 +1,16 @@
-# Dynamic Form
+# Dynamic Form(Backend part)
 
 DynamicForm is a simple form generator project. Admin can add html fields and set validation rules for each field.
 The form will be generated based on the fields and validation rules set by the admin.
 
-## Problem 
-Say in a School Management Application, each School has its own needs regarding forms, so instead of changing the code base
-for each school we can use Dynamic Forms which allows schools to create forms based on there requirement.
+## Introduction
+This project addresses the need for customizable forms in some specific Applications. For example in School Management Software which is shared among multiple schools,
+Each school has unique requirements for student admission forms and other documentation. 
+By using Dynamic Forms, schools can create and manage forms according to their specific needs without changing the underlying codebase.
 
 ## Steps To Create Dynamic Form
 
-First of all Signup using and get the Access(Bearer) & Refresh token, then add Authorization Header in Request for the Bearer Token 
+First of all Signup to get the Access(Bearer) & Refresh token. The Signup Request is as follows :
 ```json
     {
       "firstName": "string",
@@ -131,6 +132,200 @@ First of all Signup using and get the Access(Bearer) & Refresh token, then add A
             "..."
         }
     }
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+## Sample Form Field Creation Request
+
+Text Field Creation Request:
+```json
+{
+    "formId": 1,
+    "name": "student_name",
+    "type": "TEXT",
+    "label": "Student Name",
+    "validationRules": {
+        "REQUIRED": true,
+        "MIN_LENGTH": 5,
+        "MAX_LENGTH": 10,
+        "PATTERN": "^[a-zA-Z0-9]*$"
+    },
+    "remarks": "Student Name Field",
+    "placeHolder": "Enter Student Name",
+    "helpDescription": "Enter Student Name"
+}
+```
+
+Number Field Creation Request:
+```json
+{
+    "formId": 1,
+    "name": "family_members_count",
+    "type": "NUMBER",
+    "label": "Family Members Count",
+    "validationRules": {
+        "REQUIRED": true,
+        "MIN_VALUE": 1,
+        "MAX_VALUE": 10
+    },
+    "remarks": "Family Members Count Field",
+    "placeHolder": "Enter Family Members Count",
+    "helpDescription": "Enter Family Members Count"
+}
+```
+
+Radio Field Creation Request:
+```json
+{
+    "formId": 7,
+    "name": "gender",
+    "type": "RADIO",
+    "label": "Select Your Gender",
+    "validationRules": {
+        "REQUIRED": "true"
+    },
+    "remarks": "To Get Gender Of The Student",
+    "placeHolder": "",
+    "helpDescription": "Select Others If Don't Want To Reveal It",
+    "displayOptions": {
+        "male": "Male",
+        "female": "Female",
+        "others": "Others"
+    }
+}
+```
+
+Checkbox Field Creation Request:
+```json
+{
+    "formId": 7,
+    "name": "interests",
+    "type": "CHECKBOX",
+    "label": "Select Your Interests",
+    "validationRules": {
+        "REQUIRED": "true"
+    },
+    "remarks": "To Get Interests Of The Student",
+    "placeHolder": "",
+    "helpDescription": "Select All That Apply",
+    "displayOptions": {
+        "a": "Interest A",
+        "b": "Interest B",
+        "c": "Interest C"
+    }
+}
+```
+
+File Field Creation Request:
+```json
+{
+    "formId": 7,
+    "name": "student_avtar",
+    "type": "FILE",
+    "label": "Upload Your Avatar",
+    "validationRules": {
+        "REQUIRED": "true",
+        "ALLOWED_FILE_TYPES": ["AUDIO", "VIDEO", "IMAGE", "DOC"],
+        "MIN_FILES": 1,
+        "MAX_FILES": 1
+    },
+    "remarks": "To Get Avatar Of The Student",
+    "placeHolder": "",
+    "helpDescription": "Upload Your Avatar",
+    "displayOptions": {}
+}
+```
+
+Date Field Creation Request:
+```json
+{
+    "formId": 7,
+    "name": "dob",
+    "type": "DATE",
+    "label": "Select Your Date Of Birth",
+    "validationRules": {
+        "REQUIRED": "true",
+        "MIN_DATE": "2000-01-01",
+        "MAX_DATE": "2010-12-31"
+    },
+    "remarks": "To Get Date Of Birth Of The Student",
+    "placeHolder": "",
+    "helpDescription": "Select Your Date Of Birth",
+    "displayOptions": {}
+}
+```
+
+Time Field Creation Request:
+```json
+{
+    "formId": 7,
+    "name": "meeting_time",
+    "type": "TIME",
+    "label": "Select Meeting Time",
+    "validationRules": {
+        "REQUIRED": "true",
+        "MIN_TIME": "09:00",
+        "MAX_TIME": "18:00"
+    },
+    "remarks": "To Get Meeting Time Of The Student",
+    "placeHolder": "",
+    "helpDescription": "Select Meeting Time",
+    "displayOptions": {}
+}
+```
+
+DateTime Field Creation Request:
+```json
+{
+    "formId": 7,
+    "name": "event_date",
+    "type": "DATETIME_LOCAL",
+    "label": "Select Event Date",
+    "validationRules": {
+        "REQUIRED": "true",
+        "MIN_DATE_TIME": "2024-07-01T00:00",
+        "MAX_DATE_TIME": "2024-08-31T23:59"
+    },
+    "remarks": "To Get Event Date Of The Student",
+    "placeHolder": "",
+    "helpDescription": "Select Event Date",
+    "displayOptions": {}
+}
+```
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Update Existing Filled Form
+
+**Request URI: /dynamic-form/update-form**<br>
+Sample Request For Updating Filled Form:<br>
+
+```json
+    {
+        "formId": 7,
+        "userId": 4,
+        "fieldValues": {
+            "student_name": "Manish",
+            "family_members_count": 5,
+            "gender": "male",
+            "interests": ["a", "b", "c"],
+            "student_avtar": {
+                "oldIds": [302],
+                "newIds": [302],
+                "deletedIds": [252]
+            },
+            "dob": "1999-11-01",
+            "meeting_time": "09:50",
+            "event_date": "2024-08-10T10:40:20"
+        }
+    }
+```
+
+the only change in submitting form and updating filled form is when sending data of FILE type form field,<br>
+it required oldIds, newIds(if any) and deletedIds(if any).
+
+    
     ```
     formId, userId and fieldValues are required fields.<br>
 
