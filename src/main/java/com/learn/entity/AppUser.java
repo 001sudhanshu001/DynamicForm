@@ -45,4 +45,8 @@ public class AppUser {
 
     @OneToMany(mappedBy = "appUser")
     private List<UserSession> userSessions;
+
+    @OneToMany(mappedBy = "appUser")
+    private List<HtmlForm> htmlForms;
+
 }

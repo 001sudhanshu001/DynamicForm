@@ -15,6 +15,7 @@ import com.learn.repository.FilledHtmlFormRepository;
 import com.learn.repository.HtmlFormFieldRepository;
 import com.learn.repository.HtmlFormRepository;
 import com.learn.repository.UserRepository;
+import com.learn.security.exception.JwtSecurityException;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,14 @@ public class HtmlFormService {
 
 
     @Transactional
-    public HtmlForm save(HtmlForm htmlForm) {
+    public HtmlForm save(HtmlForm htmlForm, String userName) {
+        AppUser user = userRepository.findByEmail(userName).orElseThrow(
+                () -> new JwtSecurityException(
+                        JwtSecurityException.JWTErrorCode.USER_NOT_FOUND,
+                        "User Not Found"
+                )
+        );
+        htmlForm.setAppUser(user);
         return htmlFormRepository.save(htmlForm);
     }
 
@@ -210,5 +218,15 @@ public class HtmlFormService {
         if (!failedValidationResults.isEmpty()) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST, failedValidationResults.toString());
         }
+    }
+
+    public boolean checkWhetherFormBelongsToThisUser(String userName, Long formId) {
+        Long count = htmlFormRepository.countByUserNameAndFormId(userName, formId);
+        return count > 0;
+    }
+
+    public boolean checkWhetherFormBelongsToThisUser(String userName, Long formId, Long formFieldId) {
+        Long count = htmlFormRepository.countByUserNameFormIdAndFormFieldId(userName, formId, formFieldId);
+        return count > 0;
     }
 }

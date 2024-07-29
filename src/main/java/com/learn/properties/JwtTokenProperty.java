@@ -26,7 +26,7 @@ public class JwtTokenProperty {
 
     public static boolean AutoLogoutFromOtherDeviceOnOverflowSessionCount = true;
 
-    private static Duration bearerTokenExpiration = Duration.of(5, ChronoUnit.MINUTES);
+    private static Duration bearerTokenExpiration = Duration.of(10, ChronoUnit.MINUTES);
 
     private static Duration refreshTokenExpiration = Duration.of(30, ChronoUnit.MINUTES);
 

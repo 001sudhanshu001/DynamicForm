@@ -51,6 +51,10 @@ public class HtmlForm {
     @Column(name = "auto_disable_submission_after_date")
     private LocalDateTime autoDisableSubmissionAfterDate;
 
+    @ManyToOne
+    @JoinColumn(name = "form_belongs_to_user_id")
+    private AppUser appUser;
+
     @OneToMany(
             mappedBy = "htmlForm",
             fetch = FetchType.EAGER,
@@ -91,7 +95,8 @@ public class HtmlForm {
                 .findFirst();
     }
 
-    public Optional<HtmlFormField> htmlFormFieldHavingName(String formFieldName, Predicate<HtmlFormField> predicate) {
+    public Optional<HtmlFormField> htmlFormFieldHavingName(String formFieldName,
+                                                           Predicate<HtmlFormField> predicate) {
         return htmlFormFields.stream()
                 .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
                 .filter(predicate)

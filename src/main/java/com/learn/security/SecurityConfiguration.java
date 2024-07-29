@@ -35,7 +35,7 @@ public class SecurityConfiguration {
                 .exceptionHandling(configurer -> configurer.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(
                         request -> request.requestMatchers("/api/v1/auth/signup", "/api/v1/auth/signin",
-                                "/api/v1/auth/refresh").permitAll()
+                                "/api/v1/auth/refresh", "/api/v1/auth/signin-exclusively").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
