@@ -2,6 +2,7 @@ package com.learn.controller;
 
 import com.learn.constants.FormStatus;
 import com.learn.dto.dynamicfilter.AppliedDynamicFilter;
+import com.learn.dto.request.ChangeDisplayNamePayload;
 import com.learn.dto.request.HtmlFormCreationPayload;
 import com.learn.dto.request.HtmlFormFieldCreationPayload;
 import com.learn.dto.request.SubmitDynamicFormPayload;
@@ -188,6 +189,28 @@ public class HtmlFormController {
         FilledHtmlForm updatedForm = htmlFormService.updateForm(payload);
         return ResponseEntity.ok(updatedForm);
     }
+
+    @PatchMapping("/change-display-name")
+    public ResponseEntity<?> changeDisplayName(@RequestBody @Valid ChangeDisplayNamePayload payload) {
+
+        String userName = getAuthenticatedUserName();
+        Long formId = payload.getFormId();
+
+        boolean whetherFormBelongsToThisUser =
+                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+
+        if(!whetherFormBelongsToThisUser) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    new Date(), HttpServletResponse.SC_NOT_FOUND,
+                    "Not Found", "The form not Found"
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        boolean result = htmlFormService.changeDisplayName(payload);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     private String getAuthenticatedUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

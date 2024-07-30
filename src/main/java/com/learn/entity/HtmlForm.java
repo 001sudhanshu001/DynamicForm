@@ -14,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.http.HttpStatus;
 
+import javax.sound.midi.Soundbank;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
@@ -90,6 +91,7 @@ public class HtmlForm {
 
 
     public Optional<HtmlFormField> htmlFormFieldHavingName(String formFieldName) {
+
         return htmlFormFields.stream()
                 .filter(htmlFormField -> StringUtils.equals(htmlFormField.getName(), formFieldName))
                 .findFirst();
@@ -122,6 +124,17 @@ public class HtmlForm {
         }
 
         return FieldStatusChangeResult.successResult();
+    }
+
+    public boolean changeDisplayName(String fieldNameToChangeDisplayName,
+                                     String newDisplayNameForField) {
+
+         return htmlFormFieldHavingName(fieldNameToChangeDisplayName)
+                .map(htmlFormField -> {
+                    htmlFormField.setDisplayName(newDisplayNameForField);
+                    return htmlFormField;
+                })
+                .isPresent();
     }
 
 

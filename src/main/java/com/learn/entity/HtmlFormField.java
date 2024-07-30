@@ -35,6 +35,9 @@ public class HtmlFormField {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "display_name", length = 100) // TODO : Make nullable=false
+    private String displayName;
+
     @Comment("type denotes input type in html, example: radio, checkbox, text etc")
     @Column(name = "type", nullable = false, updatable = false)
     private InputType type;
@@ -160,4 +163,5 @@ public class HtmlFormField {
                 ", formId=" + formId +
                 '}';
     }
+
 }

@@ -6,6 +6,7 @@ import com.learn.dto.dynamicfilter.AppliedDynamicFilter;
 import com.learn.dto.internal.AddFormFieldResult;
 import com.learn.dto.internal.FieldStatusChangeResult;
 import com.learn.dto.internal.FieldValidationResult;
+import com.learn.dto.request.ChangeDisplayNamePayload;
 import com.learn.dto.request.SubmitDynamicFormPayload;
 import com.learn.dto.response.FilledHtmlFormResponse;
 import com.learn.entity.FilledHtmlForm;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static com.learn.constants.TableNames.HTML_FORM;
 
 @Service
 @Transactional(readOnly = true)
@@ -232,4 +235,19 @@ public class HtmlFormService {
         return count > 0;
     }
 
+    @Transactional
+    public boolean changeDisplayName(ChangeDisplayNamePayload payload) {
+        Long formId = payload.getFormId();
+        HtmlForm htmlForm = htmlFormRepository.findById(formId)
+                .orElseThrow(ExceptionHelperUtils.notFoundException(HTML_FORM, formId));
+
+        String fieldName = payload.getFieldNameToChangeDisplayName();
+        String newDisplayNameForField = payload.getNewDisplayNameForField();
+        boolean fieldDisplayNameChanged = htmlForm.changeDisplayName(fieldName, newDisplayNameForField);
+
+        if (fieldDisplayNameChanged) {
+            htmlFormRepository.save(htmlForm);
+        }
+        return fieldDisplayNameChanged;
+    }
 }

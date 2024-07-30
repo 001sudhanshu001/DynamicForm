@@ -156,7 +156,7 @@ public class AuthenticationService {
             int sessionListSizeShouldBeForCreatingNewOne = allowedSessionCount - 1;
 
             List<UserSession> deletableSessions = new ArrayList<>();
-            while (sessions.size() != sessionListSizeShouldBeForCreatingNewOne) {
+            while (!sessions.isEmpty() && sessions.size() != sessionListSizeShouldBeForCreatingNewOne) {
                 deletableSessions.add(sessions.remove(0));
             }
             // TODO : Even after deleting the session the User will be allowed to access Resource
