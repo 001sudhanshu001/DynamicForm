@@ -52,7 +52,7 @@ public class HtmlFormField {
     private Map<FormFieldValidationRule, String> validationRules;
 
     @Comment("display_order determine the form field order to show on frontend")
-    @Column(name = "display_order")
+    @Column(name = "display_order") // TODO : Make nullable=false
     private Integer displayOrder;
 
     @Comment("form field belong to the form")
@@ -97,6 +97,11 @@ public class HtmlFormField {
     public boolean fieldNameEqualsTo(String fieldName) {
         return StringUtils.equals(name, fieldName);
     }
+
+    public boolean isTypeOf(InputType inputType) {
+        return this.type.equals(inputType);
+    }
+
 
     /* -------------------- Validation --------------------- */
 

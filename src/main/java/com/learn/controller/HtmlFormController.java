@@ -4,6 +4,7 @@ import com.learn.constants.FormStatus;
 import com.learn.dto.dynamicfilter.AppliedDynamicFilter;
 import com.learn.dto.request.*;
 import com.learn.dto.response.FilledHtmlFormResponse;
+import com.learn.dto.response.HtmlFormFieldResponse;
 import com.learn.dto.response.HtmlFormResponse;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
@@ -15,6 +16,7 @@ import com.learn.validation.HtmlFormFieldCreationValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -226,6 +228,38 @@ public class HtmlFormController {
 
         HtmlForm htmlForm = htmlFormService.setFieldsDisplayOrder(payload);
         return ResponseEntity.ok(htmlFormMapper.fromHtmlForm(htmlForm));
+    }
+
+
+    @PatchMapping("/update-form-field")
+    @SneakyThrows
+    public ResponseEntity<?> updateFormField(
+            @RequestBody @Valid HtmlFormFieldCreationPayload payload) {
+
+        Long formId = payload.getFormId();
+        String userName = getAuthenticatedUserName();
+
+        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+        if(!whetherFormBelongsToThisUser) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    new Date(), HttpServletResponse.SC_NOT_FOUND,
+                    "Not Found", "The form not Found"
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        BindException bindException = new BindException(payload, "payload");
+        htmlFormFieldCreationValidator.validate(payload, bindException);
+
+        if (bindException.hasErrors()) {
+            Method method = new Object() {}.getClass().getEnclosingMethod();
+            MethodParameter methodParameter = new MethodParameter(method, 0);
+            BindingResult bindingResult = bindException.getBindingResult();
+            throw new MethodArgumentNotValidException(methodParameter, bindingResult);
+        }
+
+        HtmlFormField updatedFormField = htmlFormService.updateFormField(payload);
+        return ResponseEntity.ok(htmlFormMapper.fromHtmlFormField(updatedFormField));
     }
 
 

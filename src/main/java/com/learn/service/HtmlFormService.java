@@ -2,18 +2,17 @@ package com.learn.service;
 
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
-import com.learn.dto.dynamicfilter.AppliedDynamicFilter;
 import com.learn.dto.internal.AddFormFieldResult;
 import com.learn.dto.internal.FieldStatusChangeResult;
 import com.learn.dto.internal.FieldValidationResult;
 import com.learn.dto.request.ChangeDisplayNamePayload;
 import com.learn.dto.request.FieldsDisplayOrderPayload;
+import com.learn.dto.request.HtmlFormFieldCreationPayload;
 import com.learn.dto.request.SubmitDynamicFormPayload;
-import com.learn.dto.response.FilledHtmlFormResponse;
+import com.learn.entity.AppUser;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
 import com.learn.entity.HtmlFormField;
-import com.learn.entity.AppUser;
 import com.learn.exception.ApplicationException;
 import com.learn.repository.FilledHtmlFormRepository;
 import com.learn.repository.HtmlFormFieldRepository;
@@ -23,7 +22,6 @@ import com.learn.security.exception.JwtSecurityException;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -258,18 +256,44 @@ public class HtmlFormService {
         HtmlForm htmlForm = htmlFormRepository.findById(payload.getFormId())
                 .orElseThrow(ExceptionHelperUtils.notFoundException(HTML_FORM, payload.getFormId()));
 
-        // If a Field is Present multiple times then the last occurrence will decode the order
+        // If a Field is Present multiple times then the last occurrence will decide the order
         List<String> fieldNames = payload.getFieldNames();
         int fieldNamesSize = fieldNames.size();
         for (int i = 0; i < fieldNamesSize; i++) {
             String fieldName = fieldNames.get(i);
             boolean updatedDisplayOrder = htmlForm.setFieldDisplayOrder(fieldName, i);
             if (!updatedDisplayOrder) {
-                throw new ApplicationException(HttpStatus.BAD_REQUEST, "Can't Update DisplayOrder Of " + fieldName);
+                throw new ApplicationException(HttpStatus.BAD_REQUEST,
+                        "Can't Update DisplayOrder Of " + fieldName + ", may be this filed is not present");
             }
         }
 
         htmlFormRepository.save(htmlForm);
         return htmlForm;
     }
+
+    public HtmlFormField updateFormField(HtmlFormFieldCreationPayload payload) {
+        HtmlForm htmlForm = htmlFormRepository.findById(payload.getFormId())
+                .orElseThrow(ExceptionHelperUtils.notFoundException(HTML_FORM, payload.getFormId()));
+
+        Optional<HtmlFormField> updatedField = htmlForm.htmlFormFieldHavingName(payload.getName())
+                .filter(htmlFormField -> htmlFormField.isTypeOf(payload.getType()))
+                .map(htmlFormField -> {
+                    htmlFormField.setLabel(payload.getLabel());
+                    htmlFormField.setRemarks(payload.getRemarks());
+                    htmlFormField.setPlaceHolder(payload.getPlaceHolder());
+                    htmlFormField.setHelpDescription(payload.getHelpDescription());
+                    htmlFormField.setDisplayOptions(payload.getDisplayOptions());
+                    htmlFormField.setValidationRules(payload.getValidationRules());
+                    htmlFormField.setType(payload.getType());
+                    return htmlFormField;
+                });
+
+        if (updatedField.isEmpty()) {
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, "Field Not Found With Given Name And Type");
+        }
+        htmlFormRepository.save(htmlForm);
+        return updatedField.get();
+    }
+
 }
