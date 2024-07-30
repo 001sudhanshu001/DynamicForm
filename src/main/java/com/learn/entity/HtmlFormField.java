@@ -51,9 +51,9 @@ public class HtmlFormField {
     @Column(name = "validation_rules", columnDefinition = "json", nullable = false)
     private Map<FormFieldValidationRule, String> validationRules;
 
-    @Comment("sorting_order determine the form field order to show on frontend")
-    @Column(name = "sorting_order", nullable = false)
-    private Integer sortingOrder;
+    @Comment("display_order determine the form field order to show on frontend")
+    @Column(name = "display_order")
+    private Integer displayOrder;
 
     @Comment("form field belong to the form")
     @ManyToOne(optional = false)
@@ -152,7 +152,7 @@ public class HtmlFormField {
                 ", type=" + type +
                 ", label='" + label + '\'' +
                 ", validationRules=" + validationRules +
-                ", sortingOrder=" + sortingOrder +
+                ", displayOrder=" + displayOrder +
                 ", formFieldStatus=" + formFieldStatus +
                 ", remarks='" + remarks + '\'' +
                 ", placeHolder='" + placeHolder + '\'' +

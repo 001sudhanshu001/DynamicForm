@@ -2,10 +2,7 @@ package com.learn.controller;
 
 import com.learn.constants.FormStatus;
 import com.learn.dto.dynamicfilter.AppliedDynamicFilter;
-import com.learn.dto.request.ChangeDisplayNamePayload;
-import com.learn.dto.request.HtmlFormCreationPayload;
-import com.learn.dto.request.HtmlFormFieldCreationPayload;
-import com.learn.dto.request.SubmitDynamicFormPayload;
+import com.learn.dto.request.*;
 import com.learn.dto.response.FilledHtmlFormResponse;
 import com.learn.dto.response.HtmlFormResponse;
 import com.learn.entity.FilledHtmlForm;
@@ -209,6 +206,26 @@ public class HtmlFormController {
 
         boolean result = htmlFormService.changeDisplayName(payload);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PatchMapping("/change-display-order")
+    public ResponseEntity<?> setFieldsDisplayOrder(@RequestBody @Valid FieldsDisplayOrderPayload payload) {
+        String userName = getAuthenticatedUserName();
+        Long formId = payload.getFormId();
+
+        boolean whetherFormBelongsToThisUser =
+                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+
+        if(!whetherFormBelongsToThisUser) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    new Date(), HttpServletResponse.SC_NOT_FOUND,
+                    "Not Found", "The form not Found"
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        HtmlForm htmlForm = htmlFormService.setFieldsDisplayOrder(payload);
+        return ResponseEntity.ok(htmlFormMapper.fromHtmlForm(htmlForm));
     }
 
 

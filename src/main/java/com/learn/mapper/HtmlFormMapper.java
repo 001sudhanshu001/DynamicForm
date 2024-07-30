@@ -48,7 +48,11 @@ public class HtmlFormMapper {
         HtmlFormField htmlFormField = new HtmlFormField();
 
         htmlFormField.setFormId(payload.getFormId());
+
+        // on creation Name and Display Name Will Be the Same
         htmlFormField.setName(payload.getName());
+        htmlFormField.setDisplayName(payload.getName());
+
         htmlFormField.setType(payload.getType());
         htmlFormField.setLabel(payload.getLabel());
         htmlFormField.setValidationRules(payload.getValidationRules());
@@ -56,7 +60,7 @@ public class HtmlFormMapper {
         htmlFormField.setRemarks(payload.getRemarks());
         htmlFormField.setPlaceHolder(payload.getPlaceHolder());
         htmlFormField.setHelpDescription(payload.getHelpDescription());
-        htmlFormField.setSortingOrder(Integer.MAX_VALUE);
+        htmlFormField.setDisplayOrder(Integer.MAX_VALUE); // Initially it will have last Order
         htmlFormField.setDisplayOptions(payload.getDisplayOptions());
 
         return htmlFormField;
@@ -68,8 +72,10 @@ public class HtmlFormMapper {
         }
 
         HtmlFormFieldResponse htmlFormFieldResponse = new HtmlFormFieldResponse();
+
         htmlFormFieldResponse.setId(htmlFormField.getId());
         htmlFormFieldResponse.setName(htmlFormField.getName());
+        htmlFormFieldResponse.setDisplayName(htmlFormField.getDisplayName());
         htmlFormFieldResponse.setType(htmlFormField.getType());
         htmlFormFieldResponse.setLabel(htmlFormField.getLabel());
 
@@ -78,6 +84,7 @@ public class HtmlFormMapper {
             htmlFormFieldResponse.setValidationRules(new LinkedHashMap<>(validationRules));
         }
 
+        htmlFormFieldResponse.setDisplayOrder(htmlFormField.getDisplayOrder());
         htmlFormFieldResponse.setFormFieldStatus(htmlFormField.getFormFieldStatus());
         htmlFormFieldResponse.setRemarks(htmlFormField.getRemarks());
         htmlFormFieldResponse.setPlaceHolder(htmlFormField.getPlaceHolder());

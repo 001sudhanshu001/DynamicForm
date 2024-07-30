@@ -16,10 +16,11 @@ import java.util.Objects;
 public class HtmlFormFieldResponse {
     private Long id;
     private String name;
+    private String displayName;
     private InputType type;
     private String label;
     private Map<FormFieldValidationRule, String> validationRules;
-    private Integer sortingOrder;
+    private Integer displayOrder;
     private FormFieldStatus formFieldStatus;
     private String remarks;
     private String placeHolder;

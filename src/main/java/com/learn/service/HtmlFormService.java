@@ -7,6 +7,7 @@ import com.learn.dto.internal.AddFormFieldResult;
 import com.learn.dto.internal.FieldStatusChangeResult;
 import com.learn.dto.internal.FieldValidationResult;
 import com.learn.dto.request.ChangeDisplayNamePayload;
+import com.learn.dto.request.FieldsDisplayOrderPayload;
 import com.learn.dto.request.SubmitDynamicFormPayload;
 import com.learn.dto.response.FilledHtmlFormResponse;
 import com.learn.entity.FilledHtmlForm;
@@ -22,6 +23,7 @@ import com.learn.security.exception.JwtSecurityException;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -249,5 +251,25 @@ public class HtmlFormService {
             htmlFormRepository.save(htmlForm);
         }
         return fieldDisplayNameChanged;
+    }
+
+    @Transactional
+    public HtmlForm setFieldsDisplayOrder(FieldsDisplayOrderPayload payload) {
+        HtmlForm htmlForm = htmlFormRepository.findById(payload.getFormId())
+                .orElseThrow(ExceptionHelperUtils.notFoundException(HTML_FORM, payload.getFormId()));
+
+        // If a Field is Present multiple times then the last occurrence will decode the order
+        List<String> fieldNames = payload.getFieldNames();
+        int fieldNamesSize = fieldNames.size();
+        for (int i = 0; i < fieldNamesSize; i++) {
+            String fieldName = fieldNames.get(i);
+            boolean updatedDisplayOrder = htmlForm.setFieldDisplayOrder(fieldName, i);
+            if (!updatedDisplayOrder) {
+                throw new ApplicationException(HttpStatus.BAD_REQUEST, "Can't Update DisplayOrder Of " + fieldName);
+            }
+        }
+
+        htmlFormRepository.save(htmlForm);
+        return htmlForm;
     }
 }

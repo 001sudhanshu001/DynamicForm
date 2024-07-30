@@ -137,6 +137,15 @@ public class HtmlForm {
                 .isPresent();
     }
 
+    public boolean setFieldDisplayOrder(String fieldName, int displayOrder) {
+        return htmlFormFieldHavingName(fieldName)
+                .map(htmlFormField -> {
+                    htmlFormField.setDisplayOrder(displayOrder);
+                    return htmlFormField.getId();
+                })
+                .isPresent();
+    }
+
 
      /* -------------------- Validation ------------------ */
 
