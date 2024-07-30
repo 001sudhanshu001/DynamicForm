@@ -296,4 +296,7 @@ public class HtmlFormService {
         return updatedField.get();
     }
 
+    public void deleteFormField(Long formFieldId) {
+        htmlFormFieldRepository.deleteById(formFieldId);
+    }
 }

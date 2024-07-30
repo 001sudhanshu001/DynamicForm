@@ -1,11 +1,11 @@
-# Dynamic Form(Backend part)
+# Dynamic Form(Backend)
 
 DynamicForm is a simple form generator project. Admin can add html fields and set validation rules for each field.
 The form will be generated based on the fields and validation rules set by the admin.
 
 ## Introduction
 This project addresses the need for customizable forms in some specific Applications. For example in School Management Software which is shared among multiple schools,
-Each school has unique requirements for student admission forms and other documentation. 
+each school has unique requirements for student admission forms and other documentation.
 By using Dynamic Forms, schools can create and manage forms according to their specific needs without changing the underlying codebase.
 
 ## Steps To Create Dynamic Form
@@ -13,30 +13,30 @@ By using Dynamic Forms, schools can create and manage forms according to their s
 First of all Signup to get the Access(Bearer) & Refresh token. The Signup Request is as follows :
 ```json
     {
-      "firstName": "string",
-      "lastName": "string",
-      "email": "string",
-      "password": "string"
+      "firstName": "Sudhanshu",
+      "lastName": "Arya",
+      "email": "sudhanshu@gmail.com",
+      "password": "#4Ypu*78H026"
     }
 ```
 
 1. To create a new form, it required a name and a remarks (reason for creating form).
-    **Request URI: /dynamic-form/create-form**
+   **Request URI: /dynamic-form/create-form**
     ```json
     {
         "name": "Form Name",
         "remarks": "Small Description about the Form"
     }
     ```
-    _name_ and _remark_ are required fields.
-    Initially, the form will be created with *IN_ACTIVE* status.
-    **form name is unique** across all forms, no duplicate name allowed.
+   _name_ and _remark_ are required fields.
+   Initially, the form will be created with *IN_ACTIVE* status.
+   **form name is unique** across all forms, no duplicate name allowed.
 
 
 2. To add fields to the form, it required a form id, field name, field type, and field validation rules.
    **Request URI: /dynamic-form/add-form-field**
 
-    Sample Request For TEXT type Form Field:
+   Sample Request For TEXT type Form Field:
    ```json
     {
         "formId": 1,
@@ -54,8 +54,8 @@ First of all Signup to get the Access(Bearer) & Refresh token. The Signup Reques
         "helpDescription": "Field Help Description"
     }
     ```
-   
-     Available validation rules are:
+
+   Available validation rules are:
    ```
         REQUIRED, // for all fields
         MIN_LENGTH, MAX_LENGTH, PATTERN, //for text fields
@@ -68,20 +68,20 @@ First of all Signup to get the Access(Bearer) & Refresh token. The Signup Reques
 3. After creation of form field, it is required to activate the form field.
 
    **Request URI: /dynamic-form/make-form-field-active/{formId}/{formFieldId}**<br>
-    formId and formFieldId are path variables.
-    
+   formId and formFieldId are path variables.
+
 4. After activating at least one form field, the form can be activated.
 
    **Request URI: /dynamic-form/make-form-active/{formId}**<br>
-    formId is path variable.    
+   formId is path variable.
 
 5. When the form is active, it will be available for filling it.
-   
+
    **Request URI: /dynamic-form/fetch-form-to-fill/{formId}**<br>
-    formId is path variable.<br>
-    Where neither form is active not it's form field active, it will return 404.<br>
-    When formFields are active, but form is not active, it will return 400.<br>
-    Sample Response For Form Is:
+   formId is path variable.<br>
+   Where neither form is active not it's form field active, it will return 404.<br>
+   When formFields are active, but form is not active, it will return 400.<br>
+   Sample Response For Form Is:
     ```json
    {
       "response": {
@@ -115,11 +115,11 @@ First of all Signup to get the Access(Bearer) & Refresh token. The Signup Reques
       }
    }
     ```
-   
-7. To submit form, it required form id and form fields with values.
+
+6. To submit form, it required form id and form fields with values.
 
    **Request URI: /dynamic-form/submit-form**<br>
-    Sample Request For Submitting Form:
+   Sample Request For Submitting Form:
     ```json
     {
         "formId": 7,
@@ -132,6 +132,8 @@ First of all Signup to get the Access(Bearer) & Refresh token. The Signup Reques
             "..."
         }
     }
+    ```
+   formId, userId and fieldValues are required fields.<br>
 
 
 ----------------------------------------------------------------------------------------------------------------------------
@@ -310,11 +312,6 @@ Sample Request For Updating Filled Form:<br>
             "family_members_count": 5,
             "gender": "male",
             "interests": ["a", "b", "c"],
-            "student_avtar": {
-                "oldIds": [302],
-                "newIds": [302],
-                "deletedIds": [252]
-            },
             "dob": "1999-11-01",
             "meeting_time": "09:50",
             "event_date": "2024-08-10T10:40:20"
@@ -325,8 +322,58 @@ Sample Request For Updating Filled Form:<br>
 the only change in submitting form and updating filled form is when sending data of FILE type form field,<br>
 it required oldIds, newIds(if any) and deletedIds(if any).
 
-    
-    ```
-    formId, userId and fieldValues are required fields.<br>
+<br>
+Update Display Name for Field:<br>
 
-----------------------------------------------------------------------------------------------------------------------------
+**Request URI: /dynamic-form/change-display-name**
+Sample Request For Updating Display Name of a Field:<br>
+
+```json
+    {
+      "formId" : 9,
+      "fieldNameToChangeDisplayName" : "Name of the field",
+      "newDisplayNameForField" : "New Display Name"
+    }
+
+```
+<br>
+Update Display Order for Field : <br>
+
+**Request URI: /dynamic-form/change-display-order**<br>
+The Fields should be present in the Form<br>
+Sample Request For Updating Display Order of Fields of a Form:<br>
+
+```json
+    {
+      "formId": 123,
+      "fieldNames": ["FirstName", "LastName", "Mother's Name", "Father's Name", "Email", "Mobile No."]
+    }
+```
+
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+Filter Filled Forms
+
+Available operations For Text Fields are:
+```
+    EQUALS, NOT_EQUALS, CONTAINS, DOES_NOT_CONTAINS, STARTS_WITH, DOES_NOT_STARTS_WITH, ENDS_WITH, DOES_NOT_ENDS_WITH, IS_BLANK, IS_NOT_BLANK
+```
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>

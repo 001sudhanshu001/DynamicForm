@@ -147,6 +147,28 @@ public class HtmlFormController {
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 
+
+    @DeleteMapping("/delete-form-field/{formId}/{formFieldId}")
+    public ResponseEntity<?> deleteFormField(@PathVariable Long formId,
+                                                   @PathVariable Long formFieldId) {
+
+        String userName = getAuthenticatedUserName();
+        boolean whetherFormBelongsToThisUser =
+                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId, formFieldId);
+
+        if(!whetherFormBelongsToThisUser) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    new Date(), HttpServletResponse.SC_NOT_FOUND,
+                    "Not Found", "The form not Found"
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        htmlFormService.deleteFormField(formFieldId);
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+
     @GetMapping("/fetch-form-to-fill/{formId}")
     public ResponseEntity<?> fetchFormToFill(@PathVariable Long formId) {
         // TODO : Validate id this Form belongs to this user

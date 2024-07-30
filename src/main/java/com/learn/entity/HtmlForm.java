@@ -42,6 +42,8 @@ public class HtmlForm {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+    private LocalDateTime lastDateUpToWhichFormCanBeFilled;
+
     @Version
     private Long version;
 
