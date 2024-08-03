@@ -10,7 +10,9 @@ import com.learn.dto.dynamicfilter.filtervaluetype.WhereClauseValue;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(name = "TEXT", value = TextTypeFieldFilter.class),
-        @JsonSubTypes.Type(name = "NUMBER", value = NumberTypeFieldFilter.class)
+        @JsonSubTypes.Type(name = "NUMBER", value = NumberTypeFieldFilter.class),
+        @JsonSubTypes.Type(name = "RADIO", value = RadioTypeFieldFilter.class),
+
 })
 public abstract class AbstractFieldFilter {
     public static final String PARAMETER_INDEX_INDICATOR = "_________index_________";

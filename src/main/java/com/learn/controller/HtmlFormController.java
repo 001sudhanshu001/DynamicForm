@@ -4,7 +4,6 @@ import com.learn.constants.FormStatus;
 import com.learn.dto.dynamicfilter.AppliedDynamicFilter;
 import com.learn.dto.request.*;
 import com.learn.dto.response.FilledHtmlFormResponse;
-import com.learn.dto.response.HtmlFormFieldResponse;
 import com.learn.dto.response.HtmlFormResponse;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
@@ -194,7 +193,7 @@ public class HtmlFormController {
         return new ResponseEntity<>(new FilledHtmlFormResponse(filledHtmlForm), HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/update-form") // This is to update the filled form
+    @PutMapping("/update-form") // This is to update the filled form
     public ResponseEntity<?> updateForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
             // TODO : The form will be `submitted` by a Student, Create Student Entity and update accordingly
         String userName = getAuthenticatedUserName();
@@ -210,7 +209,7 @@ public class HtmlFormController {
         }
 
         FilledHtmlForm updatedForm = htmlFormService.updateForm(payload);
-        return ResponseEntity.ok(updatedForm);
+        return new ResponseEntity<>(new FilledHtmlFormResponse(updatedForm), HttpStatus.ACCEPTED);
     }
 
     @PatchMapping("/change-display-name")
@@ -287,7 +286,7 @@ public class HtmlFormController {
     }
 
 
-    //  SCHOOL_ADMIN ROLE and Check if this FormTemplate belong this SCHOOL_ADMIN
+    // TODO : SCHOOL_ADMIN ROLE and Check if this FormTemplate belong this SCHOOL_ADMIN
     @PostMapping("/filter-filled-forms")
     public ResponseEntity<?> filterFilledForms(@RequestBody @Valid AppliedDynamicFilter filter) {
         List<FilledHtmlFormResponse> filledHtmlFormResponses = htmlFormService.filterFilledForms(filter);

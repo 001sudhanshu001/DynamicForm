@@ -18,6 +18,8 @@ import java.util.List;
 @Setter
 public class AppliedDynamicFilter {
 
+    private Long formId;
+
     @NotNull(message = "fieldFilters cannot be null")
     @Size(min = 1, message = "fieldFilters must contains at least one filter")
     private List<AbstractFieldFilter> fieldFilters;

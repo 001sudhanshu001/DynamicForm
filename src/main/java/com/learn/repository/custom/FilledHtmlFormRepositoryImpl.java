@@ -23,7 +23,8 @@ public class FilledHtmlFormRepositoryImpl implements CustomFilledHtmlFormReposit
         appliedDynamicFilter.resolveWhereClausesWithQueryParams();
 
         // TODO -> Apply HTML Form_id or By the userName of the Created BY
-        String baseQuery = "SELECT f.id, f.form_field_values from filled_html_forms f where '1' = '1'";
+        String baseQuery = "SELECT f.id, f.form_field_values from filled_html_forms f " +
+                "where  f.html_form_id = " + appliedDynamicFilter.getFormId();
         StringBuilder queryTemplate = new StringBuilder(baseQuery);
 
         List<String> whereClauses = appliedDynamicFilter.getWhereClauses();

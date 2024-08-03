@@ -364,6 +364,16 @@ Available operations For Text Fields are:
     EQUALS, NOT_EQUALS, CONTAINS, DOES_NOT_CONTAINS, STARTS_WITH, DOES_NOT_STARTS_WITH, ENDS_WITH, DOES_NOT_ENDS_WITH, IS_BLANK, IS_NOT_BLANK
 ```
 
+Available operations For Radio Fields are:
+```
+    EQUALS, NOT_EQUALS, IS_BLANK
+```
+
+Available operations For Number Fields are:
+```
+    EQUALS, NOT_EQUALS, GREATER_THAN, GREATER_THAN_OR_EQUALS, LESS_THAN, LESS_THAN_OR_EQUALS, BETWEEN, IS_NULL, IS_NOT_NULL
+```
+
 **Request URI: /dynamic-form/filter-filled-forms**<br>
 Sample Request For Filtering Filled Forms:<br>
 
@@ -376,6 +386,18 @@ Sample Request For Filtering Filled Forms:<br>
       "operation": "EQUALS",
       "filterValue": "Shyam",
       "caseSensitive": false
+    },
+    {
+       "fieldType": "NUMBER",
+       "fieldName": "age",
+       "operation": "GREATER_THAN",
+       "filterValue": [9]
+    },
+    {
+       "fieldType": "RADIO",
+       "fieldName": "gender",
+       "operation": "EQUALS",
+       "filterValue": "male"
     }
   ]
 }
