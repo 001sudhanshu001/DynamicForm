@@ -37,14 +37,15 @@ public class AuthenticationService {
     private final SessionCreationHelper sessionCreationHelper;
 
     @Transactional
-    public JwtAuthenticationResponse signup(SignUpRequest signUpRequest) {
+    public JwtAuthenticationResponse signup(SignUpRequest signUpRequest, boolean createAdmin) {
         AppUser appUser = AppUser.builder()
                 .firstName(signUpRequest.getFirstName())
                 .lastName(signUpRequest.getLastName())
                 .email(signUpRequest.getEmail())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .role(Role.USER)
+                .role(createAdmin ? Role.ADMIN : Role.STUDENT)
                 .build();
+
         userRepository.save(appUser);
 
         Map<TokenType, String> tokenMappedByType = jwtService.generateBothToken(new UserDetailsImpl(appUser));

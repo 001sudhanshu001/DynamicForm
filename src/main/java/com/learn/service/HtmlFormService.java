@@ -136,16 +136,20 @@ public class HtmlFormService {
     }
 
     @Transactional
-    public FilledHtmlForm submitForm(SubmitDynamicFormPayload payload) {
+    public FilledHtmlForm submitForm(SubmitDynamicFormPayload payload, String userName) {
         Long formId = payload.getFormId();
-        Long userId = payload.getUserId();
 
         HtmlForm htmlForm = htmlFormRepository.findById(formId)
                 .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
 
         validateSubmittedForm(payload, htmlForm);
 
-        AppUser appUser = userRepository.getReferenceById(userId);
+        AppUser appUser = userRepository.findByEmail(userName).orElseThrow(
+                () -> new JwtSecurityException(
+                        JwtSecurityException.JWTErrorCode.USER_NOT_FOUND,
+                        "User Not Found"
+                )
+        );
 
         FilledHtmlForm filledHtmlForm = new FilledHtmlForm();
         filledHtmlForm.setAppUser(appUser);
@@ -156,20 +160,19 @@ public class HtmlFormService {
     }
 
     @Transactional
-    public FilledHtmlForm updateForm(SubmitDynamicFormPayload payload) {
-        Long formId = payload.getFormId();
-        Optional<FilledHtmlForm> optionalFilledHtmlForm =
-                filledHtmlFormRepository.findByFormIdAndUserId(formId, payload.getUserId());
-        if (optionalFilledHtmlForm.isEmpty()) {
+    public FilledHtmlForm updateForm(SubmitDynamicFormPayload payload, String userName) {
+        Long filledFormId = payload.getFormId();
+        FilledHtmlForm filledHtmlForm = // If this form does not belong to this user then give 404
+                filledHtmlFormRepository.findByFilledFormIdAndUserName(filledFormId, userName)
+                        .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "FilledHtmlForm Not Found"));
+
+        HtmlForm htmlForm = filledHtmlForm.getHtmlForm();
+        if(htmlForm == null) {
             throw new ApplicationException(HttpStatus.NOT_FOUND, "FilledHtmlForm Not Found");
         }
 
-        HtmlForm htmlForm = htmlFormRepository.findById(formId)
-                .orElseThrow(ExceptionHelperUtils.notFoundException("HtmlForm", formId));
-
         validateSubmittedForm(payload, htmlForm);
 
-        FilledHtmlForm filledHtmlForm = optionalFilledHtmlForm.get();
         filledHtmlForm.setFormFieldValues(payload.getFieldValues());
 
         return filledHtmlFormRepository.save(filledHtmlForm);
@@ -305,4 +308,5 @@ public class HtmlFormService {
     public List<FilledHtmlFormResponse> filterFilledForms(AppliedDynamicFilter filter) {
         return filledHtmlFormRepository.filterFilledForms(filter);
     }
+
 }

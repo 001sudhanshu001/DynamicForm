@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
@@ -36,11 +37,13 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class HtmlFormController {
+    // TODO : Move DB Validations in Service Layer
     private final HtmlFormService htmlFormService;
     private final HtmlFormMapper htmlFormMapper;
     private final HtmlFormFieldCreationValidator htmlFormFieldCreationValidator;
 
     @PostMapping("/create-form")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> createForm(@RequestBody @Valid HtmlFormCreationPayload payload) {
         String userName = getAuthenticatedUserName();
         if(userName != null) {
@@ -61,6 +64,7 @@ public class HtmlFormController {
     }
 
     @PostMapping("/add-form-field")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> addFormField(@RequestBody @Valid HtmlFormFieldCreationPayload payload)
             throws NoSuchMethodException, MethodArgumentNotValidException {
         Long formId = payload.getFormId();
@@ -79,10 +83,11 @@ public class HtmlFormController {
         htmlFormFieldCreationValidator.validate(payload, bindException);
 
         if (bindException.hasErrors()) {
-            Method method = HtmlFormController.class.getDeclaredMethod("addFormField", HtmlFormFieldCreationPayload.class);
+            Method method = HtmlFormController.class.
+                    getDeclaredMethod("addFormField", HtmlFormFieldCreationPayload.class);
             MethodParameter methodParameter = new MethodParameter(method, 0);
             BindingResult bindingResult = bindException.getBindingResult();
-            throw new MethodArgumentNotValidException(methodParameter, bindingResult); // Handled in GlobalExceptionHandler
+            throw new MethodArgumentNotValidException(methodParameter, bindingResult);
         }
 
         HtmlFormField htmlFormField = htmlFormMapper.fromHtmlFormFieldCreationPayload(payload);
@@ -91,6 +96,7 @@ public class HtmlFormController {
     }
 
     @PatchMapping("/make-form-active/{formId}")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> makeFormActive(@PathVariable Long formId) {
         String userName = getAuthenticatedUserName();
 
@@ -108,6 +114,7 @@ public class HtmlFormController {
     }
 
     @PatchMapping("/make-form-field-active/{formId}/{formFieldId}")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?>  makeFormFieldActive(@PathVariable Long formId,
                                                   @PathVariable Long formFieldId) {
 
@@ -128,6 +135,7 @@ public class HtmlFormController {
     }
 
     @PatchMapping("/make-form-field-inactive/{formId}/{formFieldId}")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> makeFormFieldInActive(@PathVariable Long formId,
                                                         @PathVariable Long formFieldId) {
 
@@ -149,6 +157,7 @@ public class HtmlFormController {
 
 
     @DeleteMapping("/delete-form-field/{formId}/{formFieldId}")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> deleteFormField(@PathVariable Long formId,
                                                    @PathVariable Long formFieldId) {
 
@@ -168,51 +177,36 @@ public class HtmlFormController {
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 
-
-    // TODO : Create STUDENT/PARENT Role who can fill the form
     @GetMapping("/fetch-form-to-fill/{formId}")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN', 'STUDENT', 'PARENTS')")
     public ResponseEntity<?> fetchFormToFill(@PathVariable Long formId) {
-        // TODO : Validate id this Form belongs to this user
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userName = null;
-        if (authentication != null && authentication.isAuthenticated()) {
-            userName = authentication.getName();
-        }
-
-        System.out.println("The username is " + userName);
-
         HtmlForm htmlForm = htmlFormService.fetchFormToFill(formId);
         HtmlFormResponse htmlFormResponse = htmlFormMapper.fromHtmlForm(htmlForm);
         return ResponseEntity.ok(htmlFormResponse);
     }
 
     @PostMapping("/submit-form")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN', 'STUDENT', 'PARENTS')")
     public ResponseEntity<FilledHtmlFormResponse> submitForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
-        // TODO : The form will be submitted by a Student, Create Student Entity and update accordingly
-        FilledHtmlForm filledHtmlForm = htmlFormService.submitForm(payload);
+        String userName = getAuthenticatedUserName();
+
+        FilledHtmlForm filledHtmlForm = htmlFormService.submitForm(payload, userName);
         return new ResponseEntity<>(new FilledHtmlFormResponse(filledHtmlForm), HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/update-form") // This is to update the filled form
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN', 'STUDENT', 'PARENTS')")
     public ResponseEntity<?> updateForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
-            // TODO : The form will be `submitted` by a Student, Create Student Entity and update accordingly
         String userName = getAuthenticatedUserName();
-        boolean whetherFormBelongsToThisUser =
-                htmlFormService.checkWhetherFormBelongsToThisUser(userName, payload.getFormId());
 
-        if(!whetherFormBelongsToThisUser) {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    new Date(), HttpServletResponse.SC_NOT_FOUND,
-                    "Not Found", "The form not Found"
-            );
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        }
+       // Authorization is Handled in Service layer
 
-        FilledHtmlForm updatedForm = htmlFormService.updateForm(payload);
+        FilledHtmlForm updatedForm = htmlFormService.updateForm(payload, userName);
         return new ResponseEntity<>(new FilledHtmlFormResponse(updatedForm), HttpStatus.ACCEPTED);
     }
 
     @PatchMapping("/change-display-name")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> changeDisplayName(@RequestBody @Valid ChangeDisplayNamePayload payload) {
 
         String userName = getAuthenticatedUserName();
@@ -234,6 +228,7 @@ public class HtmlFormController {
     }
 
     @PatchMapping("/change-display-order")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> setFieldsDisplayOrder(@RequestBody @Valid FieldsDisplayOrderPayload payload) {
         String userName = getAuthenticatedUserName(); // TODO : Handle, If userName is NUll
         Long formId = payload.getFormId();
@@ -253,8 +248,8 @@ public class HtmlFormController {
         return ResponseEntity.ok(htmlFormMapper.fromHtmlForm(htmlForm));
     }
 
-
     @PatchMapping("/update-form-field")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     @SneakyThrows
     public ResponseEntity<?> updateFormField(
             @RequestBody @Valid HtmlFormFieldCreationPayload payload) {
@@ -285,10 +280,21 @@ public class HtmlFormController {
         return ResponseEntity.ok(htmlFormMapper.fromHtmlFormField(updatedFormField));
     }
 
-
-    // TODO : SCHOOL_ADMIN ROLE and Check if this FormTemplate belong this SCHOOL_ADMIN
     @PostMapping("/filter-filled-forms")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> filterFilledForms(@RequestBody @Valid AppliedDynamicFilter filter) {
+        Long formId = filter.getFormId();
+        String userName = getAuthenticatedUserName();
+
+        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+        if(!whetherFormBelongsToThisUser) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    new Date(), HttpServletResponse.SC_NOT_FOUND,
+                    "Not Found", "The form not Found"
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
         List<FilledHtmlFormResponse> filledHtmlFormResponses = htmlFormService.filterFilledForms(filter);
 
         return ResponseEntity.ok(filledHtmlFormResponses);

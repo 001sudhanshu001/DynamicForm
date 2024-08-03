@@ -14,4 +14,8 @@ public interface FilledHtmlFormRepository extends
     @Query("select f from FilledHtmlForm f where f.htmlForm.id = :formId and f.appUser.id = :userId")
     Optional<FilledHtmlForm> findByFormIdAndUserId(@Param("formId") Long formId,
                                                    @Param("userId") Long userId);
+
+    @Query("select f from FilledHtmlForm f where f.htmlForm.id = :formId and f.appUser.email = :userName")
+    Optional<FilledHtmlForm> findByFilledFormIdAndUserName(@Param("formId") Long formId,
+                                                   @Param("userName") String userName);
 }

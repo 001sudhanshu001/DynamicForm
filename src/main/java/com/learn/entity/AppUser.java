@@ -46,6 +46,7 @@ public class AppUser {
     @OneToMany(mappedBy = "appUser")
     private List<UserSession> userSessions;
 
+    // Only User with Role SUPER_ADMIN and ADMIN can create forms
     @OneToMany(mappedBy = "appUser")
     private List<HtmlForm> htmlForms;
 

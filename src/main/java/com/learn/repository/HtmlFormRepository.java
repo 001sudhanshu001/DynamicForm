@@ -19,9 +19,9 @@ public interface HtmlFormRepository extends JpaRepository<HtmlForm, Long> {
     Optional<HtmlForm> getHtmlFormWithActiveFormFields(@Param("formId") Long formId,
                                                         @Param("status") FormFieldStatus status);
 
+
     @Query("SELECT COUNT(hf.id) FROM HtmlForm hf WHERE hf.id = :formId AND hf.appUser.email = :userName")
     Long countByUserNameAndFormId(@Param("userName") String userName, @Param("formId") Long formId);
-
 //    @Query("SELECT COUNT(hff.id) FROM HtmlFormField hff WHERE hff.id = :formFieldId AND hff.htmlForm.id = :formId AND hff.htmlForm.appUser.email = : userName")
 //    Long countFormAndFormId(@Param("userName") String userName, @Param("formId") Long formId, @Param("formFieldId") Long formFieldId);
 
@@ -39,6 +39,9 @@ public interface HtmlFormRepository extends JpaRepository<HtmlForm, Long> {
             @Param("formId") Long formId,
             @Param("formFieldId") Long formFieldId
     );
+
+    @Query("SELECT hf FROM HtmlForm hf WHERE hf.id = :formId AND hf.appUser.email = :userName")
+    Optional<HtmlForm> findByIdAndUserName(@Param("userName") String userName, @Param("formId") Long formId);
 
 
 }

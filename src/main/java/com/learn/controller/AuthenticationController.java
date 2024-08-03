@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,15 @@ public class AuthenticationController {
     public ResponseEntity<JwtAuthenticationResponse> signup(
             @RequestBody @Valid SignUpRequest request) {
 
-        return ResponseEntity.ok(authenticationService.signup(request));
+        return ResponseEntity.ok(authenticationService.signup(request, false));
+    }
+
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    @PostMapping("/create-admin")
+    public ResponseEntity<JwtAuthenticationResponse> createAdmin(
+            @RequestBody @Valid SignUpRequest request) {
+
+        return ResponseEntity.ok(authenticationService.signup(request, true));
     }
 
     @PostMapping("/signin")
@@ -30,7 +39,7 @@ public class AuthenticationController {
             @RequestBody @Valid SigninRequest request) {
         JwtAuthenticationResponse jwtAuthenticationResponse = authenticationService.signin(request);
 
-        // TODO : Can trigger Logout for other Sessions
+        // TODO : Can trigger Logout for other Session
         return ResponseEntity.ok(jwtAuthenticationResponse);
     }
 
@@ -51,10 +60,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(@Valid @RequestBody LogOutRequest logOutRequest) {
+    public ResponseEntity<String> logout(@Valid @RequestBody LogOutRequest logOutRequest) {
         String userName = authenticationService.logout(logOutRequest);
-
-        // TODO : Publish Event
 
         return ResponseEntity.ok("User has successfully logged out from the system!");
     }
