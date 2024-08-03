@@ -2,6 +2,7 @@ package com.learn.service;
 
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormStatus;
+import com.learn.dto.dynamicfilter.AppliedDynamicFilter;
 import com.learn.dto.internal.AddFormFieldResult;
 import com.learn.dto.internal.FieldStatusChangeResult;
 import com.learn.dto.internal.FieldValidationResult;
@@ -9,6 +10,7 @@ import com.learn.dto.request.ChangeDisplayNamePayload;
 import com.learn.dto.request.FieldsDisplayOrderPayload;
 import com.learn.dto.request.HtmlFormFieldCreationPayload;
 import com.learn.dto.request.SubmitDynamicFormPayload;
+import com.learn.dto.response.FilledHtmlFormResponse;
 import com.learn.entity.AppUser;
 import com.learn.entity.FilledHtmlForm;
 import com.learn.entity.HtmlForm;
@@ -298,5 +300,9 @@ public class HtmlFormService {
 
     public void deleteFormField(Long formFieldId) {
         htmlFormFieldRepository.deleteById(formFieldId);
+    }
+
+    public List<FilledHtmlFormResponse> filterFilledForms(AppliedDynamicFilter filter) {
+        return filledHtmlFormRepository.filterFilledForms(filter);
     }
 }

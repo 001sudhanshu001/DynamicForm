@@ -9,7 +9,7 @@ import com.learn.dto.dynamicfilter.filtervaluetype.WhereClauseValue;
         property = "fieldType"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = TextTypeFieldFilter.class, name = "TEXT")
+        @JsonSubTypes.Type(name = "TEXT", value = TextTypeFieldFilter.class)
 })
 public abstract class AbstractFieldFilter {
     public static final String PARAMETER_INDEX_INDICATOR = "_________index_________";
@@ -19,7 +19,14 @@ public abstract class AbstractFieldFilter {
     public abstract boolean isFilterable();
     public abstract WhereClauseValue getFilterValue();
     public abstract String getFieldName();
+    abstract String resolveWhereClause();
+    abstract String resolveWhereClause(int parameterIndex);
 
     public abstract Object getOperation();
 
+
+    // Only for Number, Date, Time and DateTime fields
+    protected String resolveForBetweenCase(int firstIndex, int secondIndex) {
+        throw new UnsupportedOperationException("This method is not supported for this class");
+    }
 }

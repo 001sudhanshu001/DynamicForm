@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/dynamic-form")
@@ -169,6 +170,7 @@ public class HtmlFormController {
     }
 
 
+    // TODO : Create STUDENT/PARENT Role who can fill the form
     @GetMapping("/fetch-form-to-fill/{formId}")
     public ResponseEntity<?> fetchFormToFill(@PathVariable Long formId) {
         // TODO : Validate id this Form belongs to this user
@@ -282,6 +284,15 @@ public class HtmlFormController {
 
         HtmlFormField updatedFormField = htmlFormService.updateFormField(payload);
         return ResponseEntity.ok(htmlFormMapper.fromHtmlFormField(updatedFormField));
+    }
+
+
+    //  SCHOOL_ADMIN ROLE and Check if this FormTemplate belong this SCHOOL_ADMIN
+    @PostMapping("/filter-filled-forms")
+    public ResponseEntity<?> filterFilledForms(@RequestBody @Valid AppliedDynamicFilter filter) {
+        List<FilledHtmlFormResponse> filledHtmlFormResponses = htmlFormService.filterFilledForms(filter);
+
+        return ResponseEntity.ok(filledHtmlFormResponses);
     }
 
 

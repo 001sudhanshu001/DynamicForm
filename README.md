@@ -8,6 +8,10 @@ This project addresses the need for customizable forms in some specific Applicat
 each school has unique requirements for student admission forms and other documentation.
 By using Dynamic Forms, schools can create and manage forms according to their specific needs without changing the underlying codebase.
 
+## Types of Users: <br>
+From End user perspective there will be two types of user, one will be ADMIN like School Management, which is going to create the Form.
+The others will be Students(Visitors), who will fill the form. <br>
+
 ## Steps To Create Dynamic Form
 
 First of all Signup to get the Access(Bearer) & Refresh token. The Signup Request is as follows :
@@ -358,6 +362,23 @@ Filter Filled Forms
 Available operations For Text Fields are:
 ```
     EQUALS, NOT_EQUALS, CONTAINS, DOES_NOT_CONTAINS, STARTS_WITH, DOES_NOT_STARTS_WITH, ENDS_WITH, DOES_NOT_ENDS_WITH, IS_BLANK, IS_NOT_BLANK
+```
+
+**Request URI: /dynamic-form/filter-filled-forms**<br>
+Sample Request For Filtering Filled Forms:<br>
+
+```json
+{
+  "fieldFilters": [
+    {
+      "fieldType": "TEXT",
+      "fieldName": "student_name",
+      "operation": "EQUALS",
+      "filterValue": "Manish Ovbtu",
+      "caseSensitive": false
+    }
+  ]
+}
 ```
 
 <br>
