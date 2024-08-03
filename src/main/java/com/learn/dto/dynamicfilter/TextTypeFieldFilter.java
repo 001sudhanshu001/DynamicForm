@@ -45,10 +45,10 @@ public class TextTypeFieldFilter extends AbstractFieldFilter {
                 COLUMN_NAME_INDICATOR + " ->> '%fieldName' NOT %likeOrILike '%' || ?" + PARAMETER_INDEX_INDICATOR + " || '%'", true
         ),
         STARTS_WITH(
-                COLUMN_NAME_INDICATOR +  " ->> '%fieldName' %likeOrILike ?" + PARAMETER_INDEX_INDICATOR + " || '%'", true
+                COLUMN_NAME_INDICATOR + " ->> '%fieldName' %likeOrILike ?" + PARAMETER_INDEX_INDICATOR + " || '%'", true
         ),
         DOES_NOT_STARTS_WITH(
-                COLUMN_NAME_INDICATOR +  " ->> '%fieldName' NOT %likeOrILike ?" + PARAMETER_INDEX_INDICATOR + " || '%'", true
+                COLUMN_NAME_INDICATOR + " ->> '%fieldName' NOT %likeOrILike ?" + PARAMETER_INDEX_INDICATOR + " || '%'", true
         ),
         ENDS_WITH(
                 COLUMN_NAME_INDICATOR + " ->> '%fieldName' %likeOrILike '%' || ?" + PARAMETER_INDEX_INDICATOR, true
@@ -60,7 +60,7 @@ public class TextTypeFieldFilter extends AbstractFieldFilter {
                 "(" + COLUMN_NAME_INDICATOR + " \\?\\? '%fieldName' AND " + COLUMN_NAME_INDICATOR + " ->> '%fieldName' IS NULL " + " )", false
         ),
         IS_NOT_BLANK(
-                COLUMN_NAME_INDICATOR +  " ->> '%fieldName' IS NOT NULL", false
+                COLUMN_NAME_INDICATOR + " ->> '%fieldName' IS NOT NULL", false
         );
 
         private final String operatorValue;
@@ -81,7 +81,7 @@ public class TextTypeFieldFilter extends AbstractFieldFilter {
 
     private String filterValue;
 
-    private boolean caseSensitive = true;
+    private boolean caseSensitive;
 
     @JsonIgnore
     private boolean filterable = true;
@@ -90,12 +90,12 @@ public class TextTypeFieldFilter extends AbstractFieldFilter {
     private String reasonForNotApplying;
 
     @Override
-    String resolveWhereClause() {
+    public String resolveWhereClause() {
         return operation.operatorValue.replace("%fieldName", fieldName);
     }
 
     @Override
-    String resolveWhereClause(int parameterIndex) {
+    public String resolveWhereClause(int parameterIndex) {
         return operation.operatorValue
                 .replace("%fieldName", fieldName)
                 .replace("%likeOrILike", LIKE_OR_ILIKE_MAP.get(caseSensitive))
@@ -128,13 +128,13 @@ public class TextTypeFieldFilter extends AbstractFieldFilter {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", TextTypeFieldFilter.class.getSimpleName() + "[", "]")
-                .add("fieldName='" + fieldName + "'")
-                .add("operation=" + operation)
-                .add("filterValue='" + filterValue + "'")
-                .add("caseSensitive=" + caseSensitive)
-                .add("filterable=" + filterable)
-                .toString();
+        return "TextTypeFieldFilter{" +
+                "fieldName='" + fieldName + '\'' +
+                ", operation=" + operation +
+                ", filterValue='" + filterValue + '\'' +
+                ", caseSensitive=" + caseSensitive +
+                ", filterable=" + filterable +
+                ", reasonForNotApplying='" + reasonForNotApplying + '\'' +
+                '}';
     }
-
 }

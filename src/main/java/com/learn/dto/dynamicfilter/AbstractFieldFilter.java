@@ -9,7 +9,8 @@ import com.learn.dto.dynamicfilter.filtervaluetype.WhereClauseValue;
         property = "fieldType"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(name = "TEXT", value = TextTypeFieldFilter.class)
+        @JsonSubTypes.Type(name = "TEXT", value = TextTypeFieldFilter.class),
+        @JsonSubTypes.Type(name = "NUMBER", value = NumberTypeFieldFilter.class)
 })
 public abstract class AbstractFieldFilter {
     public static final String PARAMETER_INDEX_INDICATOR = "_________index_________";
@@ -19,8 +20,8 @@ public abstract class AbstractFieldFilter {
     public abstract boolean isFilterable();
     public abstract WhereClauseValue getFilterValue();
     public abstract String getFieldName();
-    abstract String resolveWhereClause();
-    abstract String resolveWhereClause(int parameterIndex);
+    protected abstract String resolveWhereClause();
+    public abstract String resolveWhereClause(int parameterIndex);
 
     public abstract Object getOperation();
 

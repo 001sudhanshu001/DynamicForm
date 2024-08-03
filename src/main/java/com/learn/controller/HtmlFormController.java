@@ -236,7 +236,7 @@ public class HtmlFormController {
 
     @PatchMapping("/change-display-order")
     public ResponseEntity<?> setFieldsDisplayOrder(@RequestBody @Valid FieldsDisplayOrderPayload payload) {
-        String userName = getAuthenticatedUserName();
+        String userName = getAuthenticatedUserName(); // TODO : Handle, If userName is NUll
         Long formId = payload.getFormId();
 
         boolean whetherFormBelongsToThisUser =
