@@ -4,13 +4,28 @@ DynamicForm is a simple form generator project. Admin can add html fields and se
 The form will be generated based on the fields and validation rules set by the admin.
 
 ## Introduction
-This project addresses the need for customizable forms in some specific Applications. For example in School Management Software which is shared among multiple schools,
-each school has unique requirements for student admission forms and other documentation.
-By using Dynamic Forms, schools can create and manage forms according to their specific needs without changing the underlying codebase.
+In various applications where dynamic and adaptable forms are required, this project offers a flexible solution. 
+For example, consider a multi-tenant platform where different organizations need to collect different types of
+information from their users—such as surveys, registrations, or feedback forms. Instead of having a rigid form
+structure, this project allows each organization to design and implement forms tailored to their unique requirements. 
+This means that organizations can adjust fields, types, and validations as needed without modifying the core system, 
+ensuring that the solution remains relevant and adaptable across different use cases.
 
-## Types of Users: <br>
-From End user perspective there will be two types of user, one will be ADMIN like School Management, which is going to create the Form.
-The others will be Students(Visitors), who will fill the form. <br>
+## Understand Project with a Scenario: <br>
+
+This project is designed for multi-tenant environments. To illustrate its functionality, consider a School 
+Management Application shared among multiple schools, each with unique form requirements.
+
+### User Roles
+
+In this scenario, the key roles are:
+
+- **SUPER_ADMIN**: Manages the overall system, including user access and global settings.
+- **ADMIN**: School-specific administrators who create and customize forms based on their school's needs.
+- **STUDENT/PARENT**: Users who fill out the forms created by the ADMIN, such as admission forms or feedback surveys.
+
+This setup allows for flexible form management tailored to the specific needs of each school while maintaining a consistent system framework.
+<br>
 
 ## Steps To Create Dynamic Form
 
@@ -238,8 +253,7 @@ File Field Creation Request:
     },
     "remarks": "To Get Avatar Of The Student",
     "placeHolder": "",
-    "helpDescription": "Upload Your Avatar",
-    "displayOptions": {}
+    "helpDescription": "Upload Your Avatar"
 }
 ```
 
@@ -257,8 +271,7 @@ Date Field Creation Request:
     },
     "remarks": "To Get Date Of Birth Of The Student",
     "placeHolder": "",
-    "helpDescription": "Select Your Date Of Birth",
-    "displayOptions": {}
+    "helpDescription": "Select Your Date Of Birth"
 }
 ```
 
@@ -276,8 +289,7 @@ Time Field Creation Request:
     },
     "remarks": "To Get Meeting Time Of The Student",
     "placeHolder": "",
-    "helpDescription": "Select Meeting Time",
-    "displayOptions": {}
+    "helpDescription": "Select Meeting Time"
 }
 ```
 
@@ -295,8 +307,7 @@ DateTime Field Creation Request:
     },
     "remarks": "To Get Event Date Of The Student",
     "placeHolder": "",
-    "helpDescription": "Select Event Date",
-    "displayOptions": {}
+    "helpDescription": "Select Event Date"
 }
 ```
 
@@ -305,12 +316,12 @@ DateTime Field Creation Request:
 Update Existing Filled Form
 
 **Request URI: /dynamic-form/update-form**<br>
+To ensure data integrity and security, forms can only be updated by the user who originally filled them out.
 Sample Request For Updating Filled Form:<br>
 
 ```json
     {
         "formId": 7,
-        "userId": 4,
         "fieldValues": {
             "student_name": "Manish",
             "family_members_count": 5,
@@ -357,16 +368,12 @@ Sample Request For Updating Display Order of Fields of a Form:<br>
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 
-Filter Filled Forms
+## Filter Filled Forms
+ADMIN can apply filter for only those forms which were created by him. 
 
 Available operations For Text Fields are:
 ```
     EQUALS, NOT_EQUALS, CONTAINS, DOES_NOT_CONTAINS, STARTS_WITH, DOES_NOT_STARTS_WITH, ENDS_WITH, DOES_NOT_ENDS_WITH, IS_BLANK, IS_NOT_BLANK
-```
-
-Available operations For Radio Fields are:
-```
-    EQUALS, NOT_EQUALS, IS_BLANK
 ```
 
 Available operations For Number Fields are:
@@ -374,11 +381,17 @@ Available operations For Number Fields are:
     EQUALS, NOT_EQUALS, GREATER_THAN, GREATER_THAN_OR_EQUALS, LESS_THAN, LESS_THAN_OR_EQUALS, BETWEEN, IS_NULL, IS_NOT_NULL
 ```
 
+Available operations For Radio Fields are:
+```
+    EQUALS, NOT_EQUALS, IS_BLANK
+```
+
 **Request URI: /dynamic-form/filter-filled-forms**<br>
 Sample Request For Filtering Filled Forms:<br>
 
 ```json
 {
+  "formId" : 12,
   "fieldFilters": [
     {
       "fieldType": "TEXT",

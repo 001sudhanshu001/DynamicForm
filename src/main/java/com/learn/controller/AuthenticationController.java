@@ -39,7 +39,6 @@ public class AuthenticationController {
             @RequestBody @Valid SigninRequest request) {
         JwtAuthenticationResponse jwtAuthenticationResponse = authenticationService.signin(request);
 
-        // TODO : Can trigger Logout for other Session
         return ResponseEntity.ok(jwtAuthenticationResponse);
     }
 
@@ -49,7 +48,6 @@ public class AuthenticationController {
         JwtAuthenticationResponse jwtAuthenticationResponse =
                 authenticationService.signinExclusively(request);
 
-        // TODO : Trigger Logout Event for others
         return ResponseEntity.ok(jwtAuthenticationResponse);
     }
 

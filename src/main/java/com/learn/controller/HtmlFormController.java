@@ -76,7 +76,8 @@ public class HtmlFormController {
         Long formId = payload.getFormId();
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
+        boolean whetherFormBelongsToThisUser =
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,
@@ -106,7 +107,8 @@ public class HtmlFormController {
     public ResponseEntity<?> makeFormActive(@PathVariable Long formId) {
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
+        boolean whetherFormBelongsToThisUser =
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,
@@ -191,6 +193,7 @@ public class HtmlFormController {
         return ResponseEntity.ok(htmlFormResponse);
     }
 
+    // TODO : Add MediaFile while submitting form
     @PostMapping("/submit-form")
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN', 'STUDENT', 'PARENTS')")
     public ResponseEntity<FilledHtmlFormResponse> submitForm(@RequestBody @Valid SubmitDynamicFormPayload payload) {
@@ -215,8 +218,8 @@ public class HtmlFormController {
     @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN', 'STUDENT', 'PARENTS')")
     public ResponseEntity<?> fetchFilledForms(@RequestParam(name = "pageNum", required = false, defaultValue = "1")
                                                   @Min(value = 1) Integer pageNum,
-                                @RequestParam(name = "pageSize", required = false, defaultValue = "5") @Min(value = 1)
-                                    @Max(value = 5) Integer pageSize) {
+                                @RequestParam(name = "pageSize", required = false, defaultValue = "5")
+                                @Min(value = 1) @Max(value = 5) Integer pageSize) {
 
         String userName = getAuthenticatedUserName();
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
@@ -297,7 +300,8 @@ public class HtmlFormController {
         Long formId = payload.getFormId();
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
+        boolean whetherFormBelongsToThisUser =
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,
@@ -326,7 +330,8 @@ public class HtmlFormController {
         Long formId = filter.getFormId();
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
+        boolean whetherFormBelongsToThisUser =
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,

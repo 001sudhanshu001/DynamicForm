@@ -44,6 +44,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(ProblemDetail.forStatus(INTERNAL_SERVER_ERROR));
     }
 
+    // TODO -> Improve it
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleRuntime(Exception e) {
         String message = e.getMessage();
