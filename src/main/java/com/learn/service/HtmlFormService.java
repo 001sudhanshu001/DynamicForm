@@ -24,6 +24,8 @@ import com.learn.security.exception.JwtSecurityException;
 import com.learn.utils.ExceptionHelperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -160,7 +162,7 @@ public class HtmlFormService {
     }
 
     @Transactional
-    public FilledHtmlForm updateForm(SubmitDynamicFormPayload payload, String userName) {
+    public FilledHtmlForm updateFilledForm(SubmitDynamicFormPayload payload, String userName) {
         Long filledFormId = payload.getFormId();
         FilledHtmlForm filledHtmlForm = // If this form does not belong to this user then give 404
                 filledHtmlFormRepository.findByFilledFormIdAndUserName(filledFormId, userName)
@@ -178,7 +180,8 @@ public class HtmlFormService {
         return filledHtmlFormRepository.save(filledHtmlForm);
     }
 
-    private void validateSubmittedForm(SubmitDynamicFormPayload payload, HtmlForm htmlForm) {
+
+    public void validateSubmittedForm(SubmitDynamicFormPayload payload, HtmlForm htmlForm) {
         if (!htmlForm.isActive()) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST,
                     "HtmlForm Is Not In Active State, Can't Accept Submission"
@@ -190,7 +193,9 @@ public class HtmlFormService {
                 .filter(fieldName -> htmlForm.htmlFormFieldHavingName(fieldName).isEmpty())
                 .toList();
         if (!invalidFormFields.isEmpty()) { // If there are some FormField sent in the request that are not in the Database Form, then throw exception
-            throw new ApplicationException(HttpStatus.BAD_REQUEST, "Invalid FormFields Provided:: " + invalidFormFields);
+            throw new ApplicationException(
+                    HttpStatus.BAD_REQUEST, "Invalid FormFields Provided:: " + invalidFormFields
+            );
         }
 
         // If some fields are inactive and theses are sent as a request
@@ -230,12 +235,12 @@ public class HtmlFormService {
         }
     }
 
-    public boolean checkWhetherFormBelongsToThisUser(String userName, Long formId) {
+    public boolean checkWhetherFormBelongsToThisAdmin(String userName, Long formId) {
         Long count = htmlFormRepository.countByUserNameAndFormId(userName, formId);
         return count > 0;
     }
 
-    public boolean checkWhetherFormBelongsToThisUser(String userName, Long formId, Long formFieldId) {
+    public boolean checkWhetherFormBelongsToThisAdmin(String userName, Long formId, Long formFieldId) {
         Long count = htmlFormRepository.countByUserNameFormIdAndFormFieldId(userName, formId, formFieldId);
         return count > 0;
     }
@@ -309,4 +314,26 @@ public class HtmlFormService {
         return filledHtmlFormRepository.filterFilledForms(filter);
     }
 
+    public Page<FilledHtmlForm> getAllFilledFormsOfUser(String userName, Pageable pageable) {
+        AppUser user = userRepository.findByEmail(userName).orElseThrow(
+                () -> new JwtSecurityException(
+                        JwtSecurityException.JWTErrorCode.USER_NOT_FOUND,
+                        "User Not Found"
+                )
+        );
+        return filledHtmlFormRepository.findByUserName(user, pageable);
+    }
+
+    public FilledHtmlForm getFilledFormById(Long filledFormId, String userName) {
+        AppUser user = userRepository.findByEmail(userName).orElseThrow(
+                () -> new JwtSecurityException(
+                        JwtSecurityException.JWTErrorCode.USER_NOT_FOUND,
+                        "User Not Found"
+                )
+        );
+
+        return filledHtmlFormRepository.findByFilledFormIdAndUser(filledFormId, user)
+                .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "FilledHtmlForm Not Found"));
+
+    }
 }

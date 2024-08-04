@@ -14,10 +14,15 @@ import com.learn.service.HtmlFormService;
 import com.learn.validation.HtmlFormFieldCreationValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +34,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -70,7 +76,7 @@ public class HtmlFormController {
         Long formId = payload.getFormId();
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,
@@ -100,7 +106,7 @@ public class HtmlFormController {
     public ResponseEntity<?> makeFormActive(@PathVariable Long formId) {
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,
@@ -120,7 +126,7 @@ public class HtmlFormController {
 
         String userName = getAuthenticatedUserName();
         boolean whetherFormBelongsToThisUser =
-                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId, formFieldId);
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId, formFieldId);
 
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
@@ -141,7 +147,7 @@ public class HtmlFormController {
 
         String userName = getAuthenticatedUserName();
         boolean whetherFormBelongsToThisUser =
-                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId, formFieldId);
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId, formFieldId);
 
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
@@ -163,7 +169,7 @@ public class HtmlFormController {
 
         String userName = getAuthenticatedUserName();
         boolean whetherFormBelongsToThisUser =
-                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId, formFieldId);
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId, formFieldId);
 
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
@@ -201,8 +207,42 @@ public class HtmlFormController {
 
        // Authorization is Handled in Service layer
 
-        FilledHtmlForm updatedForm = htmlFormService.updateForm(payload, userName);
+        FilledHtmlForm updatedForm = htmlFormService.updateFilledForm(payload, userName);
         return new ResponseEntity<>(new FilledHtmlFormResponse(updatedForm), HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/fetch-filled-forms")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN', 'STUDENT', 'PARENTS')")
+    public ResponseEntity<?> fetchFilledForms(@RequestParam(name = "pageNum", required = false, defaultValue = "1")
+                                                  @Min(value = 1) Integer pageNum,
+                                @RequestParam(name = "pageSize", required = false, defaultValue = "5") @Min(value = 1)
+                                    @Max(value = 5) Integer pageSize) {
+
+        String userName = getAuthenticatedUserName();
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+
+        Page<FilledHtmlForm> filledForms = htmlFormService.getAllFilledFormsOfUser(userName, pageable);
+
+        // Can add logic around the pagination
+
+        List<FilledHtmlForm> content = filledForms.getContent();
+        List<FilledHtmlFormResponse> response = new ArrayList<>();
+
+        for(FilledHtmlForm filledHtmlForm : content) {
+            response.add(new FilledHtmlFormResponse(filledHtmlForm));
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/fetch-filled-form/{Id}")
+    @PreAuthorize("hasAnyAuthority('SUPER_ADMIN', 'ADMIN', 'STUDENT', 'PARENTS')")
+    public ResponseEntity<?> fetchFilledFormById(@PathVariable("Id") Long id) {
+        String userName = getAuthenticatedUserName();
+
+        FilledHtmlForm filledForm = htmlFormService.getFilledFormById(id, userName);
+
+        return ResponseEntity.ok(new FilledHtmlFormResponse(filledForm));
     }
 
     @PatchMapping("/change-display-name")
@@ -213,7 +253,7 @@ public class HtmlFormController {
         Long formId = payload.getFormId();
 
         boolean whetherFormBelongsToThisUser =
-                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
 
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
@@ -234,7 +274,7 @@ public class HtmlFormController {
         Long formId = payload.getFormId();
 
         boolean whetherFormBelongsToThisUser =
-                htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+                htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
 
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
@@ -257,7 +297,7 @@ public class HtmlFormController {
         Long formId = payload.getFormId();
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,
@@ -286,7 +326,7 @@ public class HtmlFormController {
         Long formId = filter.getFormId();
         String userName = getAuthenticatedUserName();
 
-        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisUser(userName, formId);
+        boolean whetherFormBelongsToThisUser = htmlFormService.checkWhetherFormBelongsToThisAdmin(userName, formId);
         if(!whetherFormBelongsToThisUser) {
             ErrorResponse errorResponse = new ErrorResponse(
                     new Date(), HttpServletResponse.SC_NOT_FOUND,
