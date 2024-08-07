@@ -1,8 +1,5 @@
 # Dynamic Form(Backend)
 
-DynamicForm is a simple form generator project. Admin can add html fields and set validation rules for each field.
-The form will be generated based on the fields and validation rules set by the admin.
-
 ## Introduction
 In various applications where dynamic and adaptable forms are required, this project offers a flexible solution. 
 For example, consider a multi-tenant platform where different organizations need to collect different types of
