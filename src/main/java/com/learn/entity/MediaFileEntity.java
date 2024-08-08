@@ -41,5 +41,7 @@ public class MediaFileEntity {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    // TODO : Establish Relationship with FilledHtmlForm and User
+    @ManyToOne
+    @JoinColumn(name = "image_belongs_to_filled_form")
+    private FilledHtmlForm filledHtmlForm;
 }

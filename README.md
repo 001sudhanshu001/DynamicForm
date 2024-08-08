@@ -73,13 +73,13 @@ First of all Signup to get the Access(Bearer) & Refresh token. The Signup Reques
 
    Available validation rules are:
    ```
-        REQUIRED, // for all fields
-        MIN_LENGTH, MAX_LENGTH, PATTERN, //for text fields
-        MIN_VALUE, MAX_VALUE, // for number fields
-        ALLOWED_FILE_TYPES, MIN_FILES, MAX_FILES, // for file fields
-        MIN_DATE, MAX_DATE, // for date fields
-        MIN_TIME, MAX_TIME, // for time fields
-        MIN_DATE_TIME, MAX_DATE_TIME // for datetime fields
+        REQUIRED -> for all fields
+        MIN_LENGTH, MAX_LENGTH, PATTERN -> for text fields
+        MIN_VALUE, MAX_VALUE -> for number fields
+        ALLOWED_FILE_TYPES, MIN_FILES, MAX_FILES -> for file fields
+        MIN_DATE, MAX_DATE -> for date fields
+        MIN_TIME, MAX_TIME -> for time fields
+        MIN_DATE_TIME, MAX_DATE_TIME -> for datetime fields
    ```
 3. After creation of form field, it is required to activate the form field.
 
@@ -235,7 +235,7 @@ Checkbox Field Creation Request:
 }
 ```
 
-File Field Creation Request:
+File Field Creation Request: (Still Working on File Field)
 ```json
 {
     "formId": 7,
@@ -244,7 +244,7 @@ File Field Creation Request:
     "label": "Upload Your Avatar",
     "validationRules": {
         "REQUIRED": "true",
-        "ALLOWED_FILE_TYPES": ["AUDIO", "VIDEO", "IMAGE", "DOC"],
+        "ALLOWED_FILE_TYPES": ["IMAGE"],
         "MIN_FILES": 1,
         "MAX_FILES": 1
     },

@@ -11,8 +11,10 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Table(
         name = TableNames.FILLED_HTML_FORMS,
@@ -55,6 +57,9 @@ public class FilledHtmlForm {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
+
+    @OneToMany(mappedBy = "filledHtmlForm")
+    private Set<MediaFileEntity> mediaFile = new HashSet<>(); // This is for those forms only which has FILE input
 
     public void putValueInFormField(String fieldName, Object value) {
         formFieldValues.put(fieldName, value);

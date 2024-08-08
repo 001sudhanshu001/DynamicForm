@@ -1,11 +1,12 @@
 package com.learn.entity;
 
-import com.learn.dto.internal.FieldValidationResult;
-import com.learn.entity.validator.*;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import com.learn.constants.FormFieldStatus;
 import com.learn.constants.FormFieldValidationRule;
 import com.learn.constants.InputType;
+import com.learn.dto.internal.FieldValidationResult;
+import com.learn.entity.validator.FieldValueValidator;
+import com.learn.entity.validator.FieldValueValidatorFactory;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
